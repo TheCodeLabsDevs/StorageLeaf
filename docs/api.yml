@@ -10,8 +10,6 @@ info:
 paths:
   /version:
     get:
-      tags:
-        - public
       summary: Gets information about the server version
       operationId: version
       responses:

@@ -37,7 +37,7 @@ def construct_blueprint(settings, version):
         with open(yamlPath, 'r') as yamlFile:
             specification = yaml.load(yamlFile, Loader=yaml.FullLoader)
 
-        specification['servers'][0]['url'] = '0815'
+        specification['servers'][0]['url'] = settings['api']['url']
         specification['info']['version'] = version['name']
 
         specification = json.dumps(specification)
