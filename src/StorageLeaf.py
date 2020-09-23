@@ -14,7 +14,7 @@ class StorageLeaf(FlaskBaseApp):
         super().__init__(appName, os.path.dirname(__file__), LOGGER, serveRobotsTxt=False)
 
     def _register_blueprints(self, app):
-        app.register_blueprint(Routes.construct_blueprint(self._settings))
+        app.register_blueprint(Routes.construct_blueprint(self._settings, self._version))
         return app
 
 

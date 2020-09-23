@@ -1,7 +1,11 @@
+import json
+import os
 from enum import Enum
 
-from flask import Blueprint, request, jsonify
+import yaml
+from flask import Blueprint, request, jsonify, send_from_directory, render_template
 
+from logic import Constants
 from logic.Database import Database
 from logic.RequestValidator import ValidationError, RequestValidator
 
@@ -24,12 +28,22 @@ class SensorParameters(Enum):
         return [m.value for m in SensorParameters]
 
 
-def construct_blueprint(settings):
+def construct_blueprint(settings, version):
     routes = Blueprint('routes', __name__)
 
     @routes.route('/', methods=['GET'])
     def index():
-        return "Hello World!"
+        yamlPath = os.path.join(Constants.ROOT_DIR, 'docs', 'api.yml')
+        with open(yamlPath, 'r') as yamlFile:
+            specification = yaml.load(yamlFile, Loader=yaml.FullLoader)
+
+        specification['servers'][0]['url'] = '0815'
+        specification['info']['version'] = version['name']
+
+        specification = json.dumps(specification)
+        return render_template('api.html',
+                               appName=Constants.APP_NAME,
+                               openApiSpecification=specification)
 
     @routes.route('/device/<deviceName>', methods=['POST'])
     def postSensorData(deviceName):

@@ -16,5 +16,6 @@ flask = "==1.1.2"
 gevent = "==20.9.0"
 TheCodeLabs-BaseUtils = "*"
 TheCodeLabs-FlaskUtils = "*"
+pyyaml = "==5.3.1"
 
 [dev-packages]
