@@ -46,19 +46,20 @@ def construct_blueprint(settings):
                 sensorParams = RequestValidator.validate_parameters(sensor,
                                                                     SensorParameters.get_values(),
                                                                     f'sensor "{sensor}"')
-
-                sensorName = sensorParams[SensorParameters.NAME.value]
-                sensorType = sensorParams[SensorParameters.TYPE.value]
-                sensorValue = sensorParams[SensorParameters.VALUE.value]
-
-                sensor = database.get_sensor(device[0], sensorName)
-                if sensor:
-                    database.update_sensor(device, sensorName, sensorType, sensorValue)
-                else:
-                    database.add_sensor(device, sensorName, sensorType, sensorValue)
+                __add_or_update_sensor(database, device, sensorParams)
         except ValidationError as e:
             return e.response, 400
 
         return ""
+
+    def __add_or_update_sensor(database, device, sensorParams):
+        sensorName = sensorParams[SensorParameters.NAME.value]
+        sensorType = sensorParams[SensorParameters.TYPE.value]
+        sensorValue = sensorParams[SensorParameters.VALUE.value]
+        sensor = database.get_sensor(device[0], sensorName)
+        if sensor:
+            database.update_sensor(device, sensorName, sensorType, sensorValue)
+        else:
+            database.add_sensor(device, sensorName, sensorType, sensorValue)
 
     return routes
