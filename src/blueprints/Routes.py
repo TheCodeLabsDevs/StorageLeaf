@@ -3,7 +3,7 @@ import os
 from enum import Enum
 
 import yaml
-from flask import Blueprint, request, jsonify, send_from_directory, render_template
+from flask import Blueprint, request, jsonify, render_template
 
 from logic import Constants
 from logic.Database import Database
