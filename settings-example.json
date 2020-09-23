@@ -6,5 +6,8 @@
         "useSSL": false,
         "keyfile": "",
         "certfile": ""
+    },
+    "database": {
+        "databasePath": "storageLeaf.db"
     }
 }
