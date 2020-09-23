@@ -12,6 +12,7 @@ from logic.RequestValidator import ValidationError, RequestValidator
 
 
 class DeviceParameters(Enum):
+    DEVICE = 'device'
     SENSORS = 'sensors'
 
     @staticmethod
@@ -75,38 +76,6 @@ def construct_blueprint(settings, version):
 
         return jsonify(database.get_all_sensors_for_device(deviceID))
 
-    @routes.route('/device/<deviceName>', methods=['POST'])
-    def postSensorData(deviceName):
-        try:
-            parameters = RequestValidator.validate(request, DeviceParameters.get_values())
-            database = Database(settings['database']['databasePath'])
-
-            if not database.get_device_by_name(deviceName):
-                database.add_device(deviceName)
-            device = database.get_device_by_name(deviceName)
-
-            sensors = parameters[DeviceParameters.SENSORS.value]
-            for sensor in sensors:
-                sensorParams = RequestValidator.validate_parameters(sensor,
-                                                                    SensorParameters.get_values(),
-                                                                    f'sensor "{sensor}"')
-                sensor = __add_sensor_if_not_exists(database, int(device['id']), sensorParams)
-                database.add_measurement(int(sensor['id']), sensorParams[SensorParameters.VALUE.value])
-        except ValidationError as e:
-            return e.response, 400
-
-        return ""
-
-    def __add_sensor_if_not_exists(database: Database, deviceID: int, sensorParams: Dict) -> Dict[str, str]:
-        sensorName = sensorParams[SensorParameters.NAME.value]
-        sensorType = sensorParams[SensorParameters.TYPE.value]
-        sensor = database.get_sensor_by_name_and_device_id(deviceID, sensorName)
-        if sensor:
-            return sensor
-
-        database.add_sensor(deviceID, sensorName, sensorType)
-        return database.get_sensor_by_name_and_device_id(deviceID, sensorName)
-
     @routes.route('/measurements', methods=['GET'])
     def get_all_measurements():
         database = Database(settings['database']['databasePath'])
@@ -125,5 +94,38 @@ def construct_blueprint(settings, version):
             return jsonify({'success': False, 'msg': f'No sensor with id "{sensorID}" existing'})
 
         return jsonify(database.get_all_measurements_for_sensor(sensorID))
+
+    @routes.route('/measurements', methods=['POST'])
+    def addMeasurement():
+        try:
+            parameters = RequestValidator.validate(request, DeviceParameters.get_values())
+            database = Database(settings['database']['databasePath'])
+
+            deviceName = parameters[DeviceParameters.DEVICE.value]
+            if not database.get_device_by_name(deviceName):
+                database.add_device(deviceName)
+            device = database.get_device_by_name(deviceName)
+
+            sensors = parameters[DeviceParameters.SENSORS.value]
+            for sensor in sensors:
+                sensorParams = RequestValidator.validate_parameters(sensor,
+                                                                    SensorParameters.get_values(),
+                                                                    f'sensor "{sensor}"')
+                sensor = __add_sensor_if_not_exists(database, int(device['id']), sensorParams)
+                database.add_measurement(int(sensor['id']), sensorParams[SensorParameters.VALUE.value])
+        except ValidationError as e:
+            return e.response, 400
+
+        return jsonify({'success': True})
+
+    def __add_sensor_if_not_exists(database: Database, deviceID: int, sensorParams: Dict) -> Dict[str, str]:
+        sensorName = sensorParams[SensorParameters.NAME.value]
+        sensorType = sensorParams[SensorParameters.TYPE.value]
+        sensor = database.get_sensor_by_name_and_device_id(deviceID, sensorName)
+        if sensor:
+            return sensor
+
+        database.add_sensor(deviceID, sensorName, sensorType)
+        return database.get_sensor_by_name_and_device_id(deviceID, sensorName)
 
     return routes

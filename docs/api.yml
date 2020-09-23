@@ -136,6 +136,29 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Measurement'
+    post:
+      summary: Adds a new measurement
+      operationId: addMeasurement
+      requestBody:
+        description: Measurement to add
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewDeviceMeasurement'
+      responses:
+        '200':
+          description: success response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        default:
+          description: error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /measurement/{measurementID}:
     get:
       summary: Gets a specific measurement
@@ -230,6 +253,39 @@ components:
           type: string
           format: date-time
           example: "2020-09-23 20:58:00"
+
+    NewDeviceMeasurement:
+      type: object
+      required:
+        - device
+        - sensors
+      properties:
+        device:
+          type: string
+          example: "myDevice"
+        sensors:
+          type: array
+          items:
+            allOf:
+              - $ref: '#/components/schemas/NewMeasurement'
+              - type: object
+
+    NewMeasurement:
+      type: object
+      required:
+        - name
+        - type
+        - value
+      properties:
+        name:
+          type: string
+          example: "mySensor"
+        type:
+          type: string
+          example: "temperature"
+        value:
+          type: string
+          example: "20.15"
 
     SuccessResponse:
       required:
