@@ -50,10 +50,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Device'
+  /device/{deviceName}/sensors:
+    get:
+      summary: Gets all sensors for a specific device
+      operationId: deviceSensors
+      parameters:
+        - in: path
+          name: deviceName
+          description: The device name
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: All available sensors
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Sensor'
   /device/{deviceName}/sensors/{sensorName}:
     get:
-      summary: Gets a specific device
-      operationId: device
+      summary: Gets a specific sensor for a device
+      operationId: deviceSensor
       parameters:
         - in: path
           name: deviceName

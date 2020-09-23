@@ -60,6 +60,15 @@ def construct_blueprint(settings, version):
         database = Database(settings['database']['databasePath'])
         return jsonify(database.get_all_sensors())
 
+    @routes.route('/device/<deviceName>/sensors/', methods=['GET'])
+    def get_all_sensors_for_device(deviceName):
+        database = Database(settings['database']['databasePath'])
+        device = database.get_device(deviceName)
+        if not device:
+            return jsonify({'success': False, 'msg': f'No device with name "{deviceName}" existing'})
+
+        return jsonify(database.get_all_sensors_for_device(device))
+
     @routes.route('/device/<deviceName>/sensors/<sensorName>', methods=['GET'])
     def get_sensor(deviceName, sensorName):
         database = Database(settings['database']['databasePath'])

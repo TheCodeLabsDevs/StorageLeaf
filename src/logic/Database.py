@@ -82,6 +82,11 @@ class Database:
     def get_all_sensors(self):
         return self.__query(f'SELECT * FROM {self.TABLE_SENSOR} ORDER BY device_id, name', fetch_type=FetchType.ALL)
 
+    def get_all_sensors_for_device(self, device: Dict[str, str]):
+        return self.__query(f'SELECT * FROM {self.TABLE_SENSOR} WHERE device_id = ? ORDER BY name',
+                            device['id'],
+                            fetch_type=FetchType.ALL)
+
     def get_sensor(self, deviceID: int, name: str):
         return self.__query(f'SELECT * FROM {self.TABLE_SENSOR} WHERE device_id = ? AND name = ?',
                             deviceID, name,
