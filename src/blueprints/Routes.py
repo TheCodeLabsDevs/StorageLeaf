@@ -35,20 +35,27 @@ def construct_blueprint(settings):
     def postSensorData(deviceName):
         try:
             parameters = RequestValidator.validate(request, DeviceParameters.get_values())
+            database = Database(settings['database']['databasePath'])
+
+            if not database.get_device(deviceName):
+                database.add_device(deviceName)
+            device = database.get_device(deviceName)
+
             sensors = parameters[DeviceParameters.SENSORS.value]
             for sensor in sensors:
                 sensorParams = RequestValidator.validate_parameters(sensor,
                                                                     SensorParameters.get_values(),
                                                                     f'sensor "{sensor}"')
-                database = Database(settings['database']['databasePath'])
-                database.add_device_if_not_exists(deviceName)
-                device = database.get_device(deviceName)
-                database.add_or_update_sensor(device,
-                                              sensorParams['name'],
-                                              sensorParams['type'],
-                                              sensorParams['value'])
-                return jsonify(database.get_device("0182"))
 
+                sensorName = sensorParams[SensorParameters.NAME.value]
+                sensorType = sensorParams[SensorParameters.TYPE.value]
+                sensorValue = sensorParams[SensorParameters.VALUE.value]
+
+                sensor = database.get_sensor(device[0], sensorName)
+                if sensor:
+                    database.update_sensor(device, sensorName, sensorType, sensorValue)
+                else:
+                    database.add_sensor(device, sensorName, sensorType, sensorValue)
         except ValidationError as e:
             return e.response, 400
 

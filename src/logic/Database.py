@@ -42,11 +42,7 @@ class Database:
             cursor = connection.execute(f'SELECT * FROM {self.TABLE_DEVICE} WHERE name = "{deviceName}"')
             return cursor.fetchone()
 
-    def add_device_if_not_exists(self, deviceName: str):
-        if self.get_device(deviceName):
-            LOGGER.debug(f'Device "{deviceName}" already exists')
-            return
-
+    def add_device(self, deviceName: str):
         with self.__get_connection() as connection:
             LOGGER.debug(f'Inserting new device "{deviceName}"')
             connection.execute(f'INSERT INTO {self.TABLE_DEVICE}(name) VALUES(?)', (deviceName,))
@@ -56,24 +52,22 @@ class Database:
             cursor = connection.execute(f'SELECT * FROM {self.TABLE_SENSOR} ORDER BY device_id, name')
             return cursor.fetchall()
 
-    def get_sensor(self, deviceName: str, name: str):
-        device = self.get_device(deviceName)
-        if not device:
-            return None
-
+    def get_sensor(self, deviceID: int, name: str):
         with self.__get_connection() as connection:
             cursor = connection.execute(f'SELECT * FROM {self.TABLE_SENSOR} WHERE device_id = ? AND name = ?',
-                                        (device[0], name))
+                                        (deviceID, name))
             return cursor.fetchone()
 
-    def add_or_update_sensor(self, device: Tuple[int, str], name: str, sensorType: str, value: str):
-        sensor = self.get_sensor(device[1], name)
+    def add_sensor(self, device: Tuple[int, str], name: str, sensorType: str, value: str):
         with self.__get_connection() as connection:
-            if sensor:
-                LOGGER.debug(f'Updating sensor "{name}" for device "{device[1]}" (type: "{sensorType}", value: "{value}")')
-                connection.execute(f'UPDATE {self.TABLE_SENSOR} SET value = ? WHERE device_id = ? AND name = ?',
-                                   (value, device[0], name))
-            else:
-                LOGGER.debug(f'Inserting new sensor "{name}" for device "{device[1]}" (type: "{sensorType}", value: "{value}")')
-                connection.execute(f'INSERT INTO {self.TABLE_SENSOR}(name, device_id, type, value) VALUES(?, ?, ?, ?)',
-                                   (name, device[0], sensorType, value))
+            LOGGER.debug(f'Inserting new sensor "{name}" for device "{device[1]}" '
+                         f'(type: "{sensorType}", value: "{value}")')
+            connection.execute(f'INSERT INTO {self.TABLE_SENSOR}(name, device_id, type, value) VALUES(?, ?, ?, ?)',
+                               (name, device[0], sensorType, value))
+
+    def update_sensor(self, device: Tuple[int, str], name: str, sensorType: str, value: str):
+        LOGGER.debug(f'Updating sensor "{name}" for device "{device[1]}" '
+                     f'(type: "{sensorType}", value: "{value}")')
+        with self.__get_connection() as connection:
+            connection.execute(f'UPDATE {self.TABLE_SENSOR} SET value = ? WHERE device_id = ? AND name = ?',
+                               (value, device[0], name))
