@@ -45,6 +45,16 @@ def construct_blueprint(settings, version):
                                appName=Constants.APP_NAME,
                                openApiSpecification=specification)
 
+    @routes.route('/devices', methods=['GET'])
+    def get_all_devices():
+        database = Database(settings['database']['databasePath'])
+        return jsonify(database.get_all_devices())
+
+    @routes.route('/device/<deviceName>', methods=['GET'])
+    def get_device(deviceName):
+        database = Database(settings['database']['databasePath'])
+        return jsonify(database.get_device(deviceName))
+
     @routes.route('/device/<deviceName>', methods=['POST'])
     def postSensorData(deviceName):
         try:
