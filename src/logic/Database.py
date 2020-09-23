@@ -128,7 +128,7 @@ class Database:
     def add_measurement(self, sensorID: int, value: str):
         sensor = self.get_sensor(sensorID)
         LOGGER.debug(f'Inserting new measurement for sensor "{sensor["name"]}" '
-                     f'(value: "{value}", device_id "{sensor["device_id"]})')
+                     f'(value: "{value}", device_id "{sensor["device_id"]}")')
         self.__query(f'INSERT INTO {self.TABLE_MEASUREMENT}(sensor_id, value, timestamp ) VALUES(?, ?, ?)',
                      sensorID, value, self.__get_current_datetime(),
                      fetch_type=FetchType.NONE)
