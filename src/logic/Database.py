@@ -1,4 +1,5 @@
 import sqlite3
+from datetime import datetime
 from typing import Tuple
 
 from TheCodeLabs_BaseUtils import DefaultLogger
@@ -11,6 +12,8 @@ LOGGER = DefaultLogger().create_logger_if_not_exists(Constants.APP_NAME)
 class Database:
     TABLE_DEVICE = 'device'
     TABLE_SENSOR = 'sensor'
+
+    DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
 
     def __init__(self, databasePath):
         self._databasePath = databasePath
@@ -27,10 +30,14 @@ class Database:
                          device_id INTEGER,
                          name TEXT NOT NULL, 
                          type TEXT NOT NULL, 
-                         value TEXT NOT NULL)''')
+                         value TEXT NOT NULL,
+                         timestamp TEXT NOT NULL)''')
 
     def __get_connection(self):
         return sqlite3.connect(self._databasePath)
+
+    def __get_current_datetime(self):
+        return datetime.strftime(datetime.now(), self.DATE_FORMAT)
 
     def get_all_devices(self):
         with self.__get_connection() as connection:
@@ -62,12 +69,14 @@ class Database:
         with self.__get_connection() as connection:
             LOGGER.debug(f'Inserting new sensor "{name}" for device "{device[1]}" '
                          f'(type: "{sensorType}", value: "{value}")')
-            connection.execute(f'INSERT INTO {self.TABLE_SENSOR}(name, device_id, type, value) VALUES(?, ?, ?, ?)',
-                               (name, device[0], sensorType, value))
+            connection.execute(f'INSERT INTO {self.TABLE_SENSOR}(name, device_id, type, value, timestamp ) '
+                               f'VALUES(?, ?, ?, ?, ?)',
+                               (name, device[0], sensorType, value, self.__get_current_datetime()))
 
     def update_sensor(self, device: Tuple[int, str], name: str, sensorType: str, value: str):
         LOGGER.debug(f'Updating sensor "{name}" for device "{device[1]}" '
                      f'(type: "{sensorType}", value: "{value}")')
         with self.__get_connection() as connection:
-            connection.execute(f'UPDATE {self.TABLE_SENSOR} SET value = ? WHERE device_id = ? AND name = ?',
-                               (value, device[0], name))
+            connection.execute(f'UPDATE {self.TABLE_SENSOR} SET value = ?, timestamp = ? '
+                               f'WHERE device_id = ? AND name = ?',
+                               (value, self.__get_current_datetime(), device[0], name, ))
