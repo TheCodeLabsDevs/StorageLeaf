@@ -32,17 +32,17 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Device'
-  /device/{deviceName}:
+  /device/{deviceID}:
     get:
       summary: Gets a specific device
       operationId: device
       parameters:
         - in: path
-          name: deviceName
-          description: The device name
+          name: deviceID
+          description: The device id
           required: true
           schema:
-            type: string
+            type: integer
       responses:
         '200':
           description: The device
@@ -50,17 +50,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Device'
-  /device/{deviceName}/sensors:
+  /device/{deviceID}/sensors:
     get:
       summary: Gets all sensors for a specific device
       operationId: deviceSensors
       parameters:
         - in: path
-          name: deviceName
-          description: The device name
+          name: deviceID
+          description: The device id
           required: true
           schema:
-            type: string
+            type: integer
       responses:
         '200':
           description: All available sensors
@@ -70,30 +70,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Sensor'
-  /device/{deviceName}/sensors/{sensorName}:
-    get:
-      summary: Gets a specific sensor for a device
-      operationId: deviceSensor
-      parameters:
-        - in: path
-          name: deviceName
-          description: The device name
-          required: true
-          schema:
-            type: string
-        - in: path
-          name: sensorName
-          description: The sensor name
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: The sensor
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Sensor'
 
   /sensors:
     get:
@@ -108,6 +84,76 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Sensor'
+  /sensor/{sensorID}:
+    get:
+      summary: Gets a specific sensor
+      operationId: sensor
+      parameters:
+        - in: path
+          name: sensorID
+          description: The sensor id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: The sensor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sensor'
+  /sensor/{sensorID}/measurements:
+    get:
+      summary: Gets all measurements for a specific sensor
+      operationId: sensorMeasurements
+      parameters:
+        - in: path
+          name: sensorID
+          description: The sensor id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: All available measurements
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Measurement'
+
+  /measurements:
+    get:
+      summary: Gets all measurements
+      operationId: measurements
+      responses:
+        '200':
+          description: All available measurements
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Measurement'
+  /measurement/{measurementID}:
+    get:
+      summary: Gets a specific measurement
+      operationId: measurement
+      parameters:
+        - in: path
+          name: measurementID
+          description: The measurement id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: The measurement
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Measurement'
 
 components:
   schemas:
@@ -149,7 +195,6 @@ components:
         - device_id
         - name
         - sensor_type
-        - value
       properties:
         id:
           type: integer
@@ -163,9 +208,28 @@ components:
         sensor_type:
           type: string
           example: "temperature"
+
+    Measurement:
+      type: object
+      required:
+        - id
+        - sensor_id
+        - value
+        - timestamp
+      properties:
+        id:
+          type: integer
+          example: 1
+        sensor_id:
+          type: integer
+          example: 1
         value:
           type: string
           example: "20.15"
+        timestamp:
+          type: string
+          format: date-time
+          example: "2020-09-23 20:58:00"
 
     SuccessResponse:
       required:
