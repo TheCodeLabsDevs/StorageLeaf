@@ -11,6 +11,7 @@
         "databasePath": "storageLeaf.db"
     },
     "api": {
-        "url": "http://localhost:10003"
+        "url": "http://localhost:10003",
+        "key": ""
     }
 }

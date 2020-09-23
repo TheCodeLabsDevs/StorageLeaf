@@ -7,6 +7,7 @@ import yaml
 from flask import Blueprint, request, jsonify, render_template
 
 from logic import Constants
+from logic.AuthenticationWrapper import require_api_key
 from logic.Database import Database
 from logic.RequestValidator import ValidationError, RequestValidator
 
@@ -96,6 +97,7 @@ def construct_blueprint(settings, version):
         return jsonify(database.get_all_measurements_for_sensor(sensorID))
 
     @routes.route('/measurements', methods=['POST'])
+    @require_api_key(password=settings['api']['key'])
     def addMeasurement():
         try:
             parameters = RequestValidator.validate(request, DeviceParameters.get_values())

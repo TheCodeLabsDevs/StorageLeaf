@@ -139,6 +139,13 @@ paths:
     post:
       summary: Adds a new measurement. Non-existent device or sensor will be created automatically.
       operationId: addMeasurement
+      parameters:
+        - in: header
+          name: apiKey
+          description: The api key
+          required: true
+          schema:
+            type: string
       requestBody:
         description: Measurement to add
         required: true
