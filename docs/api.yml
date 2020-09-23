@@ -137,7 +137,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/Measurement'
     post:
-      summary: Adds a new measurement
+      summary: Adds a new measurement. Non-existent device or sensor will be created automatically.
       operationId: addMeasurement
       requestBody:
         description: Measurement to add
