@@ -50,6 +50,44 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Device'
+  /device/{deviceName}/sensors/{sensorName}:
+    get:
+      summary: Gets a specific device
+      operationId: device
+      parameters:
+        - in: path
+          name: deviceName
+          description: The device name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: sensorName
+          description: The sensor name
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The sensor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sensor'
+
+  /sensors:
+    get:
+      summary: Gets all sensors
+      operationId: sensors
+      responses:
+        '200':
+          description: All available sensors
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Sensor'
 
 components:
   schemas:
@@ -74,15 +112,40 @@ components:
     Device:
       type: object
       required:
-        - ID
+        - id
         - name
       properties:
-        ID:
+        id:
           type: integer
           example: 1
-        Projectname:
+        name:
           type: string
           example: "My Device"
+
+    Sensor:
+      type: object
+      required:
+        - id
+        - device_id
+        - name
+        - sensor_type
+        - value
+      properties:
+        id:
+          type: integer
+          example: 1
+        device_id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "My Device"
+        sensor_type:
+          type: string
+          example: "temperature"
+        value:
+          type: string
+          example: "20.15"
 
     SuccessResponse:
       required:

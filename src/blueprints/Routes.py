@@ -55,6 +55,20 @@ def construct_blueprint(settings, version):
         database = Database(settings['database']['databasePath'])
         return jsonify(database.get_device(deviceName))
 
+    @routes.route('/sensors', methods=['GET'])
+    def get_all_sensors():
+        database = Database(settings['database']['databasePath'])
+        return jsonify(database.get_all_sensors())
+
+    @routes.route('/device/<deviceName>/sensors/<sensorName>', methods=['GET'])
+    def get_sensor(deviceName, sensorName):
+        database = Database(settings['database']['databasePath'])
+        device = database.get_device(deviceName)
+        if not device:
+            return jsonify({'success': False, 'msg': f'No device with name "{deviceName}" existing'})
+
+        return jsonify(database.get_sensor(device['id'], sensorName))
+
     @routes.route('/device/<deviceName>', methods=['POST'])
     def postSensorData(deviceName):
         try:
@@ -80,7 +94,7 @@ def construct_blueprint(settings, version):
         sensorName = sensorParams[SensorParameters.NAME.value]
         sensorType = sensorParams[SensorParameters.TYPE.value]
         sensorValue = sensorParams[SensorParameters.VALUE.value]
-        sensor = database.get_sensor(device[0], sensorName)
+        sensor = database.get_sensor(device['id'], sensorName)
         if sensor:
             database.update_sensor(device, sensorName, sensorType, sensorValue)
         else:

@@ -1,7 +1,7 @@
 import sqlite3
 from datetime import datetime
 from enum import Enum
-from typing import Tuple
+from typing import Tuple, Dict
 
 from TheCodeLabs_BaseUtils import DefaultLogger
 
@@ -87,18 +87,18 @@ class Database:
                             deviceID, name,
                             fetch_type=FetchType.ONE)
 
-    def add_sensor(self, device: Tuple[int, str], name: str, sensorType: str, value: str):
-        LOGGER.debug(f'Inserting new sensor "{name}" for device "{device[1]}" '
+    def add_sensor(self, device: Dict[str, str], name: str, sensorType: str, value: str):
+        LOGGER.debug(f'Inserting new sensor "{name}" for device "{device["name"]}" '
                      f'(type: "{sensorType}", value: "{value}")')
         self.__query(f'INSERT INTO {self.TABLE_SENSOR}(name, device_id, type, value, timestamp ) '
                      f'VALUES(?, ?, ?, ?, ?)',
-                     name, device[0], sensorType, value, self.__get_current_datetime(),
+                     name, device['id'], sensorType, value, self.__get_current_datetime(),
                      fetch_type=FetchType.NONE)
 
-    def update_sensor(self, device: Tuple[int, str], name: str, sensorType: str, value: str):
-        LOGGER.debug(f'Updating sensor "{name}" for device "{device[1]}" '
+    def update_sensor(self, device: Dict[str, str], name: str, sensorType: str, value: str):
+        LOGGER.debug(f'Updating sensor "{name}" for device "{device["name"]}" '
                      f'(type: "{sensorType}", value: "{value}")')
         self.__query(f'UPDATE {self.TABLE_SENSOR} SET value = ?, timestamp = ? '
                      f'WHERE device_id = ? AND name = ?',
-                     value, self.__get_current_datetime(), device[0], name,
+                     value, self.__get_current_datetime(), device['id'], name,
                      fetch_type=FetchType.NONE)
