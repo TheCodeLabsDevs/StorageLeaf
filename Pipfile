@@ -13,7 +13,7 @@ python_version = "3"
 
 [packages]
 flask = "==1.1.2"
-gevent = "==20.6.1"
+gevent = "==20.9.0"
 TheCodeLabs-BaseUtils = "*"
 TheCodeLabs-FlaskUtils = "*"
 

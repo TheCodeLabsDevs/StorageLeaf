@@ -5,8 +5,6 @@ from TheCodeLabs_FlaskUtils.FlaskBaseApp import FlaskBaseApp
 
 from blueprints import Routes
 from logic import Constants
-from logic.Page import PageManager
-from logic.services.JenkinsSingleJobService import JenkinsSingleJobService
 
 LOGGER = DefaultLogger().create_logger_if_not_exists(Constants.APP_NAME)
 
