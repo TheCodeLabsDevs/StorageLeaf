@@ -51,59 +51,59 @@ def construct_blueprint(settings, version):
     @routes.route('/devices', methods=['GET'])
     def get_all_devices():
         database = Database(settings['database']['databasePath'])
-        return jsonify(database.get_all_devices())
+        return jsonify(database.deviceAccess.get_all_devices())
 
     @routes.route('/device/<int:deviceID>', methods=['GET'])
     def get_device(deviceID):
         database = Database(settings['database']['databasePath'])
-        return jsonify(database.get_device(deviceID))
+        return jsonify(database.deviceAccess.get_device(deviceID))
 
     @routes.route('/sensors', methods=['GET'])
     def get_all_sensors():
         database = Database(settings['database']['databasePath'])
-        return jsonify(database.get_all_sensors())
+        return jsonify(database.sensorAccess.get_all_sensors())
 
     @routes.route('/sensor/<int:sensorID>', methods=['GET'])
     def get_sensor(sensorID):
         database = Database(settings['database']['databasePath'])
-        return jsonify(database.get_sensor(sensorID))
+        return jsonify(database.sensorAccess.get_sensor(sensorID))
 
     @routes.route('/device/<int:deviceID>/sensors/', methods=['GET'])
     def get_all_sensors_for_device(deviceID):
         database = Database(settings['database']['databasePath'])
-        device = database.get_device(deviceID)
+        device = database.deviceAccess.get_device(deviceID)
         if not device:
             return jsonify({'success': False, 'msg': f'No device with id "{deviceID}" existing'})
 
-        return jsonify(database.get_all_sensors_for_device(deviceID))
+        return jsonify(database.sensorAccess.get_all_sensors_for_device(deviceID))
 
     @routes.route('/measurements', methods=['GET'])
     def get_all_measurements():
         database = Database(settings['database']['databasePath'])
-        return jsonify(database.get_all_measurements())
+        return jsonify(database.measurementAccess.get_all_measurements())
 
     @routes.route('/measurement/<int:measurementID>', methods=['GET'])
     def get_measurement(measurementID):
         database = Database(settings['database']['databasePath'])
-        return jsonify(database.get_measurement(measurementID))
+        return jsonify(database.measurementAccess.get_measurement(measurementID))
 
     @routes.route('/sensor/<sensorID>/measurements', methods=['GET'])
     def get_all_measurements_for_sensor(sensorID):
         database = Database(settings['database']['databasePath'])
-        sensor = database.get_sensor(sensorID)
+        sensor = database.sensorAccess.get_sensor(sensorID)
         if not sensor:
             return jsonify({'success': False, 'msg': f'No sensor with id "{sensorID}" existing'})
 
-        return jsonify(database.get_all_measurements_for_sensor(sensorID))
+        return jsonify(database.measurementAccess.get_all_measurements_for_sensor(sensorID))
 
     @routes.route('/sensor/<sensorID>/measurements/latest', methods=['GET'])
     def get_latest_measurements_for_sensor(sensorID):
         database = Database(settings['database']['databasePath'])
-        sensor = database.get_sensor(sensorID)
+        sensor = database.sensorAccess.get_sensor(sensorID)
         if not sensor:
             return jsonify({'success': False, 'msg': f'No sensor with id "{sensorID}" existing'})
 
-        return jsonify(database.get_latest_measurements_for_sensor(sensorID))
+        return jsonify(database.measurementAccess.get_latest_measurements_for_sensor(sensorID))
 
     @routes.route('/measurements', methods=['POST'])
     @require_api_key(password=settings['api']['key'])
@@ -113,9 +113,9 @@ def construct_blueprint(settings, version):
             database = Database(settings['database']['databasePath'])
 
             deviceName = parameters[DeviceParameters.DEVICE.value]
-            if not database.get_device_by_name(deviceName):
-                database.add_device(deviceName)
-            device = database.get_device_by_name(deviceName)
+            if not database.deviceAccess.get_device_by_name(deviceName):
+                database.deviceAccess.add_device(deviceName)
+            device = database.deviceAccess.get_device_by_name(deviceName)
 
             sensors = parameters[DeviceParameters.SENSORS.value]
             for sensor in sensors:
@@ -123,7 +123,8 @@ def construct_blueprint(settings, version):
                                                                     SensorParameters.get_values(),
                                                                     f'sensor "{sensor}"')
                 sensor = __add_sensor_if_not_exists(database, int(device['id']), sensorParams)
-                database.add_measurement(int(sensor['id']), sensorParams[SensorParameters.VALUE.value])
+                database.measurementAccess.add_measurement(int(sensor['id']),
+                                                           sensorParams[SensorParameters.VALUE.value])
         except ValidationError as e:
             return e.response, 400
 
@@ -132,11 +133,11 @@ def construct_blueprint(settings, version):
     def __add_sensor_if_not_exists(database: Database, deviceID: int, sensorParams: Dict) -> Dict[str, str]:
         sensorName = sensorParams[SensorParameters.NAME.value]
         sensorType = sensorParams[SensorParameters.TYPE.value]
-        sensor = database.get_sensor_by_name_and_device_id(deviceID, sensorName)
+        sensor = database.sensorAccess.get_sensor_by_name_and_device_id(deviceID, sensorName)
         if sensor:
             return sensor
 
-        database.add_sensor(deviceID, sensorName, sensorType)
-        return database.get_sensor_by_name_and_device_id(deviceID, sensorName)
+        database.sensorAccess.add_sensor(deviceID, sensorName, sensorType)
+        return database.sensorAccess.get_sensor_by_name_and_device_id(deviceID, sensorName)
 
     return routes
