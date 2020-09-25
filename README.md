@@ -1,6 +1,7 @@
 # StorageLeaf
 
-Accepts sensor data and saves them into a database. The saved data can be accessed via api.
+Accepts sensor data and saves them into a database. The saved data can be accessed via api.  
+An interactive OpenAPI Swagger documentation can be accessed by opening the server url in your web browser (e.g. http://localhost:10003).
 
 ## Installation on Raspberry Pi Zero
 - pipenv is causing some problems
