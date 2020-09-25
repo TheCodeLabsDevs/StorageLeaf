@@ -103,6 +103,34 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Sensor'
+  /device:
+    post:
+      tags:
+        - device
+      summary: Adds a new device. If a device with the provided name already exists an error response is returned.
+      operationId: addDevice
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: Device to add
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewDevice'
+      responses:
+        '200':
+          description: success response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        default:
+          description: error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /sensors:
     get:
@@ -415,6 +443,15 @@ components:
         value:
           type: string
           example: "20.15"
+
+    NewDevice:
+      type: object
+      required:
+        - device
+      properties:
+        device:
+          type: string
+          example: "myDevice"
 
     SuccessResponse:
       required:

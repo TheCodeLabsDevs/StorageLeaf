@@ -23,7 +23,7 @@ def construct_blueprint(settings):
 
     @measurements.route('/measurements', methods=['POST'])
     @require_api_key(password=settings['api']['key'])
-    def addMeasurement():
+    def add_measurement():
         try:
             parameters = RequestValidator.validate(request, DeviceParameters.get_values())
             database = Database(settings['database']['databasePath'])

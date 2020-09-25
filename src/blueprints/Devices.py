@@ -1,6 +1,8 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 
 from logic.AuthenticationWrapper import require_api_key
+from logic.Parameters import DeviceParameters
+from logic.RequestValidator import RequestValidator, ValidationError
 from logic.database.Database import Database
 
 
@@ -39,6 +41,25 @@ def construct_blueprint(settings):
             database.sensorAccess.delete_sensor(sensor['id'])
 
         database.deviceAccess.delete_device(deviceID)
+
+        return jsonify({'success': True})
+
+    @devices.route('/device', methods=['POST'])
+    @require_api_key(password=settings['api']['key'])
+    def add_device():
+        try:
+            parameters = RequestValidator.validate(request, [DeviceParameters.DEVICE.value])
+            database = Database(settings['database']['databasePath'])
+
+            deviceName = parameters[DeviceParameters.DEVICE.value]
+            existingDevice = database.deviceAccess.get_device_by_name(deviceName)
+            if existingDevice:
+                return jsonify({'success': False,
+                                'msg': f'A device called "{deviceName}" already exists (ID: {existingDevice["id"]})'})
+
+            database.deviceAccess.add_device(deviceName)
+        except ValidationError as e:
+            return e.response, 400
 
         return jsonify({'success': True})
 
