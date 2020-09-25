@@ -1,13 +1,12 @@
 import abc
+import logging
 import sqlite3
 from abc import ABC
 from enum import Enum
 
-from TheCodeLabs_BaseUtils import DefaultLogger
-
 from logic import Constants
 
-LOGGER = DefaultLogger().create_logger_if_not_exists(Constants.APP_NAME)
+LOGGER = logging.getLogger(Constants.APP_NAME)
 
 
 class FetchType(Enum):

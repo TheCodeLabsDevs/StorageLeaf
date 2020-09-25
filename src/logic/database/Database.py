@@ -1,11 +1,11 @@
-from TheCodeLabs_BaseUtils import DefaultLogger
+import logging
 
 from logic import Constants
 from logic.database.DeviceAccess import DeviceAccess
 from logic.database.MeasurementAccess import MeasurementAccess
 from logic.database.SensorAccess import SensorAccess
 
-LOGGER = DefaultLogger().create_logger_if_not_exists(Constants.APP_NAME)
+LOGGER = logging.getLogger(Constants.APP_NAME)
 
 
 class Database:

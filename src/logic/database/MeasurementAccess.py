@@ -1,12 +1,11 @@
+import logging
 from datetime import datetime
 from typing import Dict, List
-
-from TheCodeLabs_BaseUtils import DefaultLogger
 
 from logic import Constants
 from logic.database.DatabaseAccess import DatabaseAccess, FetchType
 
-LOGGER = DefaultLogger().create_logger_if_not_exists(Constants.APP_NAME)
+LOGGER = logging.getLogger(Constants.APP_NAME)
 
 
 class MeasurementAccess(DatabaseAccess):
