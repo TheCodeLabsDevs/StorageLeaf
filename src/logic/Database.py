@@ -111,7 +111,7 @@ class Database:
                      fetch_type=FetchType.NONE)
 
     def get_all_measurements(self) -> List[Dict[str, str]]:
-        return self.__query(f'SELECT * FROM {self.TABLE_MEASUREMENT} ORDER BY sensor_id, date(timestamp)',
+        return self.__query(f'SELECT * FROM {self.TABLE_MEASUREMENT} ORDER BY sensor_id ASC, datetime(timestamp) DESC',
                             fetch_type=FetchType.ALL)
 
     def get_measurement(self, measurementID: int) -> Dict[str, str] or None:
@@ -121,7 +121,7 @@ class Database:
 
     def get_all_measurements_for_sensor(self, sensorID: int) -> List[Dict[str, str]]:
         return self.__query(f'SELECT * FROM {self.TABLE_MEASUREMENT} WHERE sensor_id = ? '
-                            f'ORDER BY sensor_id, date(timestamp)',
+                            f'ORDER BY datetime(timestamp) DESC',
                             sensorID,
                             fetch_type=FetchType.ALL)
 
