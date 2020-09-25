@@ -3,7 +3,7 @@ import os
 from TheCodeLabs_BaseUtils.DefaultLogger import DefaultLogger
 from TheCodeLabs_FlaskUtils.FlaskBaseApp import FlaskBaseApp
 
-from blueprints import Routes
+from blueprints import Routes, Devices
 from logic import Constants
 
 LOGGER = DefaultLogger().create_logger_if_not_exists(Constants.APP_NAME)
@@ -15,6 +15,8 @@ class StorageLeaf(FlaskBaseApp):
 
     def _register_blueprints(self, app):
         app.register_blueprint(Routes.construct_blueprint(self._settings, self._version))
+        app.register_blueprint(Devices.construct_blueprint(self._settings))
+
         return app
 
 

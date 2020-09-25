@@ -48,16 +48,6 @@ def construct_blueprint(settings, version):
                                appName=Constants.APP_NAME,
                                openApiSpecification=specification)
 
-    @routes.route('/devices', methods=['GET'])
-    def get_all_devices():
-        database = Database(settings['database']['databasePath'])
-        return jsonify(database.deviceAccess.get_all_devices())
-
-    @routes.route('/device/<int:deviceID>', methods=['GET'])
-    def get_device(deviceID):
-        database = Database(settings['database']['databasePath'])
-        return jsonify(database.deviceAccess.get_device(deviceID))
-
     @routes.route('/sensors', methods=['GET'])
     def get_all_sensors():
         database = Database(settings['database']['databasePath'])
@@ -67,15 +57,6 @@ def construct_blueprint(settings, version):
     def get_sensor(sensorID):
         database = Database(settings['database']['databasePath'])
         return jsonify(database.sensorAccess.get_sensor(sensorID))
-
-    @routes.route('/device/<int:deviceID>/sensors/', methods=['GET'])
-    def get_all_sensors_for_device(deviceID):
-        database = Database(settings['database']['databasePath'])
-        device = database.deviceAccess.get_device(deviceID)
-        if not device:
-            return jsonify({'success': False, 'msg': f'No device with id "{deviceID}" existing'})
-
-        return jsonify(database.sensorAccess.get_all_sensors_for_device(deviceID))
 
     @routes.route('/measurements', methods=['GET'])
     def get_all_measurements():
