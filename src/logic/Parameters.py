@@ -19,3 +19,13 @@ class SensorParameters(Enum):
     @staticmethod
     def get_values():
         return [m.value for m in SensorParameters]
+
+
+class MeasurementParameters(Enum):
+    SENSOR_ID = 'sensor_id'
+    VALUE = 'value'
+
+    @staticmethod
+    def get_values():
+        return [m.value for m in MeasurementParameters]
+

@@ -285,12 +285,12 @@ paths:
     post:
       tags:
         - measurement
-      summary: Adds a new measurement. Non-existent device or sensor will be created automatically.
-      operationId: addMeasurement
+      summary: Adds multiple measurements. Non-existent device and sensors will be created automatically.
+      operationId: addMeasurements
       security:
         - bearerAuth: []
       requestBody:
-        description: Measurement to add
+        description: Measurements to add
         required: true
         content:
           application/json:
@@ -356,6 +356,34 @@ paths:
               application/json:
                 schema:
                   $ref: '#/components/schemas/ErrorResponse'
+  /measurement:
+    post:
+      tags:
+        - measurement
+      summary: Adds a new measurement for the given sensor.
+      operationId: addMeasurement
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: Measurement to add
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewMeasurement'
+      responses:
+        '200':
+          description: success response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        default:
+          description: error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
 components:
   securitySchemes:
@@ -452,10 +480,10 @@ components:
           type: array
           items:
             allOf:
-              - $ref: '#/components/schemas/NewMeasurement'
+              - $ref: '#/components/schemas/NewSensorMeasurement'
               - type: object
 
-    NewMeasurement:
+    NewSensorMeasurement:
       type: object
       required:
         - name
@@ -468,6 +496,19 @@ components:
         type:
           type: string
           example: "temperature"
+        value:
+          type: string
+          example: "20.15"
+
+    NewMeasurement:
+      type: object
+      required:
+        - sensor_id
+        - value
+      properties:
+        sensor_id:
+          type: integer
+          example: 1
         value:
           type: string
           example: "20.15"
