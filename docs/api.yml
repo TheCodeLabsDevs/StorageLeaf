@@ -112,6 +112,33 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Sensor'
+    delete:
+      tags:
+        - sensor
+      summary: Deletes a specific sensor. All correspondig measurements will be deleted too.
+      operationId: deleteSensor
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: sensorID
+          description: The sensor id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: success response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+          default:
+            description: error response
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
   /sensor/{sensorID}/measurements:
     get:
       tags:

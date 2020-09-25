@@ -53,3 +53,6 @@ class MeasurementAccess(DatabaseAccess):
         LOGGER.debug(f'Deleting measurement "{measurementID}"')
         self._query(f'DELETE FROM {self.TABLE_NAME} WHERE id = ?', measurementID, fetch_type=FetchType.NONE)
 
+    def delete_measurements_for_sensor(self, sensorID: int):
+        LOGGER.debug(f'Deleting all measurement for sensor "{sensorID}"')
+        self._query(f'DELETE FROM {self.TABLE_NAME} WHERE sensor_id = ?', sensorID, fetch_type=FetchType.NONE)
