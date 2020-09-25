@@ -12,25 +12,6 @@ from logic.Database import Database
 from logic.RequestValidator import ValidationError, RequestValidator
 
 
-class DeviceParameters(Enum):
-    DEVICE = 'device'
-    SENSORS = 'sensors'
-
-    @staticmethod
-    def get_values():
-        return [m.value for m in DeviceParameters]
-
-
-class SensorParameters(Enum):
-    NAME = 'name'
-    TYPE = 'type'
-    VALUE = 'value'
-
-    @staticmethod
-    def get_values():
-        return [m.value for m in SensorParameters]
-
-
 def construct_blueprint(settings, version):
     routes = Blueprint('routes', __name__)
 
@@ -48,16 +29,6 @@ def construct_blueprint(settings, version):
                                appName=Constants.APP_NAME,
                                openApiSpecification=specification)
 
-    @routes.route('/sensors', methods=['GET'])
-    def get_all_sensors():
-        database = Database(settings['database']['databasePath'])
-        return jsonify(database.sensorAccess.get_all_sensors())
-
-    @routes.route('/sensor/<int:sensorID>', methods=['GET'])
-    def get_sensor(sensorID):
-        database = Database(settings['database']['databasePath'])
-        return jsonify(database.sensorAccess.get_sensor(sensorID))
-
     @routes.route('/measurements', methods=['GET'])
     def get_all_measurements():
         database = Database(settings['database']['databasePath'])
@@ -67,24 +38,6 @@ def construct_blueprint(settings, version):
     def get_measurement(measurementID):
         database = Database(settings['database']['databasePath'])
         return jsonify(database.measurementAccess.get_measurement(measurementID))
-
-    @routes.route('/sensor/<sensorID>/measurements', methods=['GET'])
-    def get_all_measurements_for_sensor(sensorID):
-        database = Database(settings['database']['databasePath'])
-        sensor = database.sensorAccess.get_sensor(sensorID)
-        if not sensor:
-            return jsonify({'success': False, 'msg': f'No sensor with id "{sensorID}" existing'})
-
-        return jsonify(database.measurementAccess.get_all_measurements_for_sensor(sensorID))
-
-    @routes.route('/sensor/<sensorID>/measurements/latest', methods=['GET'])
-    def get_latest_measurements_for_sensor(sensorID):
-        database = Database(settings['database']['databasePath'])
-        sensor = database.sensorAccess.get_sensor(sensorID)
-        if not sensor:
-            return jsonify({'success': False, 'msg': f'No sensor with id "{sensorID}" existing'})
-
-        return jsonify(database.measurementAccess.get_latest_measurements_for_sensor(sensorID))
 
     @routes.route('/measurements', methods=['POST'])
     @require_api_key(password=settings['api']['key'])
