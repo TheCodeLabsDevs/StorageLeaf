@@ -56,4 +56,14 @@ def construct_blueprint(settings):
         database.sensorAccess.add_sensor(deviceID, sensorName, sensorType)
         return database.sensorAccess.get_sensor_by_name_and_device_id(deviceID, sensorName)
 
+    @measurements.route('/measurement/<int:measurementID>', methods=['DELETE'])
+    @require_api_key(password=settings['api']['key'])
+    def delete_measurement(measurementID):
+        database = Database(settings['database']['databasePath'])
+        if not database.measurementAccess.get_measurement(measurementID):
+            return jsonify({'success': False, 'msg': f'No measurement with id "{measurementID}" existing'})
+
+        database.measurementAccess.delete_measurement(measurementID)
+        return jsonify({'success': True})
+
     return measurements

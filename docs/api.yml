@@ -219,6 +219,33 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Measurement'
+    delete:
+      tags:
+        - measurement
+      summary: Deletes a specific measurement
+      operationId: deleteMeasurement
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: measurementID
+          description: The measurement id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: success response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+          default:
+            description: error response
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
 
 components:
   securitySchemes:

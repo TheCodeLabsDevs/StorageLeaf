@@ -48,3 +48,8 @@ class MeasurementAccess(DatabaseAccess):
         self._query(f'INSERT INTO {self.TABLE_NAME}(sensor_id, value, timestamp ) VALUES(?, ?, ?)',
                     sensorID, value, self.__get_current_datetime(),
                     fetch_type=FetchType.NONE)
+
+    def delete_measurement(self, measurementID: int):
+        LOGGER.debug(f'Deleting measurement "{measurementID}"')
+        self._query(f'DELETE FROM {self.TABLE_NAME} WHERE id = ?', measurementID, fetch_type=FetchType.NONE)
+
