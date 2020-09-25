@@ -28,3 +28,7 @@ class DeviceAccess(DatabaseAccess):
     def add_device(self, deviceName: str):
         LOGGER.debug(f'Inserting new device "{deviceName}"')
         self._query(f'INSERT INTO {self.TABLE_NAME}(name) VALUES(?)', deviceName, fetch_type=FetchType.NONE)
+
+    def delete_device(self, deviceID: int):
+        LOGGER.debug(f'Deleting device "{deviceID}"')
+        self._query(f'DELETE FROM {self.TABLE_NAME} WHERE id = ?', deviceID, fetch_type=FetchType.NONE)
