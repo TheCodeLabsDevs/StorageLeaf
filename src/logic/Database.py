@@ -125,6 +125,12 @@ class Database:
                             sensorID,
                             fetch_type=FetchType.ALL)
 
+    def get_latest_measurements_for_sensor(self, sensorID: int) -> Dict[str, str] or None:
+        return self.__query(f'SELECT * FROM {self.TABLE_MEASUREMENT} WHERE sensor_id = ? '
+                            f'ORDER BY datetime(timestamp) DESC LIMIT 1',
+                            sensorID,
+                            fetch_type=FetchType.ONE)
+
     def add_measurement(self, sensorID: int, value: str):
         sensor = self.get_sensor(sensorID)
         LOGGER.debug(f'Inserting new measurement for sensor "{sensor["name"]}" '

@@ -96,6 +96,15 @@ def construct_blueprint(settings, version):
 
         return jsonify(database.get_all_measurements_for_sensor(sensorID))
 
+    @routes.route('/sensor/<sensorID>/measurements/latest', methods=['GET'])
+    def get_latest_measurements_for_sensor(sensorID):
+        database = Database(settings['database']['databasePath'])
+        sensor = database.get_sensor(sensorID)
+        if not sensor:
+            return jsonify({'success': False, 'msg': f'No sensor with id "{sensorID}" existing'})
+
+        return jsonify(database.get_latest_measurements_for_sensor(sensorID))
+
     @routes.route('/measurements', methods=['POST'])
     @require_api_key(password=settings['api']['key'])
     def addMeasurement():

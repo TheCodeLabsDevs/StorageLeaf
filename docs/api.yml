@@ -122,6 +122,26 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Measurement'
+  /sensor/{sensorID}/measurements/latest:
+    get:
+      summary: Gets the latest measurement for a specific sensor
+      operationId: sensorMeasurementsLatest
+      parameters:
+        - in: path
+          name: sensorID
+          description: The sensor id
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: The latest measurement
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Measurement'
 
   /measurements:
     get:
