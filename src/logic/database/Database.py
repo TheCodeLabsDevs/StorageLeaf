@@ -1,11 +1,9 @@
-from enum import Enum
-
 from TheCodeLabs_BaseUtils import DefaultLogger
 
 from logic import Constants
-from logic.DeviceAccess import DeviceAccess
-from logic.MeasurementAccess import MeasurementAccess
-from logic.SensorAccess import SensorAccess
+from logic.database.DeviceAccess import DeviceAccess
+from logic.database.MeasurementAccess import MeasurementAccess
+from logic.database.SensorAccess import SensorAccess
 
 LOGGER = DefaultLogger().create_logger_if_not_exists(Constants.APP_NAME)
 

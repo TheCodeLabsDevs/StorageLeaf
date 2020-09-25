@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify
 
-from logic.Database import Database
+from logic.database.Database import Database
 
 
 def construct_blueprint(settings):

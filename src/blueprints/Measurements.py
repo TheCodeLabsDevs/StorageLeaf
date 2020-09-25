@@ -3,7 +3,7 @@ from typing import Dict
 from flask import Blueprint, jsonify, request
 
 from logic.AuthenticationWrapper import require_api_key
-from logic.Database import Database
+from logic.database.Database import Database
 from logic.Parameters import DeviceParameters, SensorParameters
 from logic.RequestValidator import RequestValidator, ValidationError
 

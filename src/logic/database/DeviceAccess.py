@@ -3,7 +3,7 @@ from typing import Dict, List
 from TheCodeLabs_BaseUtils import DefaultLogger
 
 from logic import Constants
-from logic.DatabaseAccess import DatabaseAccess, FetchType
+from logic.database.DatabaseAccess import DatabaseAccess, FetchType
 
 LOGGER = DefaultLogger().create_logger_if_not_exists(Constants.APP_NAME)
 
