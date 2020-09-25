@@ -1,17 +1,6 @@
-from enum import Enum
-
 from flask import Blueprint, jsonify
 
 from logic.Database import Database
-
-
-class DeviceParameters(Enum):
-    DEVICE = 'device'
-    SENSORS = 'sensors'
-
-    @staticmethod
-    def get_values():
-        return [m.value for m in DeviceParameters]
 
 
 def construct_blueprint(settings):
