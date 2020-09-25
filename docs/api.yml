@@ -21,6 +21,8 @@ paths:
                 $ref: '#/components/schemas/Version'
   /devices:
     get:
+      tags:
+        - device
       summary: Gets all devices
       operationId: devices
       responses:
@@ -34,6 +36,8 @@ paths:
                   $ref: '#/components/schemas/Device'
   /device/{deviceID}:
     get:
+      tags:
+        - device
       summary: Gets a specific device
       operationId: device
       parameters:
@@ -52,6 +56,8 @@ paths:
                 $ref: '#/components/schemas/Device'
   /device/{deviceID}/sensors:
     get:
+      tags:
+        - device
       summary: Gets all sensors for a specific device
       operationId: deviceSensors
       parameters:
@@ -73,6 +79,8 @@ paths:
 
   /sensors:
     get:
+      tags:
+        - sensor
       summary: Gets all sensors
       operationId: sensors
       responses:
@@ -86,6 +94,8 @@ paths:
                   $ref: '#/components/schemas/Sensor'
   /sensor/{sensorID}:
     get:
+      tags:
+        - sensor
       summary: Gets a specific sensor
       operationId: sensor
       parameters:
@@ -104,6 +114,8 @@ paths:
                 $ref: '#/components/schemas/Sensor'
   /sensor/{sensorID}/measurements:
     get:
+      tags:
+        - sensor
       summary: Gets all measurements for a specific sensor
       operationId: sensorMeasurements
       parameters:
@@ -124,6 +136,8 @@ paths:
                   $ref: '#/components/schemas/Measurement'
   /sensor/{sensorID}/measurements/latest:
     get:
+      tags:
+        - sensor
       summary: Gets the latest measurement for a specific sensor
       operationId: sensorMeasurementsLatest
       parameters:
@@ -145,6 +159,8 @@ paths:
 
   /measurements:
     get:
+      tags:
+        - measurement
       summary: Gets all measurements
       operationId: measurements
       responses:
@@ -157,6 +173,8 @@ paths:
                 items:
                   $ref: '#/components/schemas/Measurement'
     post:
+      tags:
+        - measurement
       summary: Adds a new measurement. Non-existent device or sensor will be created automatically.
       operationId: addMeasurement
       security:
@@ -183,6 +201,8 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
   /measurement/{measurementID}:
     get:
+      tags:
+        - measurement
       summary: Gets a specific measurement
       operationId: measurement
       parameters:
