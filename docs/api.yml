@@ -238,6 +238,34 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Measurement'
+  /sensor:
+    post:
+      tags:
+        - sensor
+      summary: Adds a new sensor. If a sensor with the provided name already exists for the given device id an error response is returned.
+      operationId: addSensor
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: Sensor to add
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewSensor'
+      responses:
+        '200':
+          description: success response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        default:
+          description: error response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /measurements:
     get:
@@ -374,7 +402,7 @@ components:
         - id
         - device_id
         - name
-        - sensor_type
+        - type
       properties:
         id:
           type: integer
@@ -384,8 +412,8 @@ components:
           example: 1
         name:
           type: string
-          example: "My Device"
-        sensor_type:
+          example: "My Sensor"
+        type:
           type: string
           example: "temperature"
 
@@ -452,6 +480,23 @@ components:
         device:
           type: string
           example: "myDevice"
+
+    NewSensor:
+      type: object
+      required:
+        - device_id
+        - name
+        - type
+      properties:
+        device_id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: "My Sensor"
+        type:
+          type: string
+          example: "temperature"
 
     SuccessResponse:
       required:

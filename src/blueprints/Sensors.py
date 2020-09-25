@@ -1,6 +1,8 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, request
 
 from logic.AuthenticationWrapper import require_api_key
+from logic.Parameters import SensorParameters
+from logic.RequestValidator import RequestValidator, ValidationError
 from logic.database.Database import Database
 
 
@@ -44,6 +46,34 @@ def construct_blueprint(settings):
 
         database.measurementAccess.delete_measurements_for_sensor(sensorID)
         database.sensorAccess.delete_sensor(sensorID)
+        return jsonify({'success': True})
+
+    @sensors.route('/sensor', methods=['POST'])
+    @require_api_key(password=settings['api']['key'])
+    def add_sensor():
+        try:
+            parameters = RequestValidator.validate(request, [SensorParameters.NAME.value,
+                                                             SensorParameters.TYPE.value,
+                                                             SensorParameters.DEVICE_ID.value])
+            database = Database(settings['database']['databasePath'])
+
+            deviceID = parameters[SensorParameters.DEVICE_ID.value]
+            sensorName = parameters[SensorParameters.NAME.value]
+            sensorType = parameters[SensorParameters.TYPE.value]
+
+            device = database.deviceAccess.get_device(deviceID)
+            if not device:
+                return jsonify({'success': False, 'msg': f'No device with id "{deviceID}" existing'})
+
+            existingSensor = database.sensorAccess.get_sensor_by_name_and_device_id(deviceID, sensorName)
+            if existingSensor:
+                return jsonify({'success': False,
+                                'msg': f'A sensor called "{sensorName}" already exists (ID: {existingSensor["id"]}) for device {deviceID}'})
+
+            database.sensorAccess.add_sensor(deviceID, sensorName, sensorType)
+        except ValidationError as e:
+            return e.response, 400
+
         return jsonify({'success': True})
 
     return sensors

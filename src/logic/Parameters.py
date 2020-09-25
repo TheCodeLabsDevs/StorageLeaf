@@ -14,6 +14,7 @@ class SensorParameters(Enum):
     NAME = 'name'
     TYPE = 'type'
     VALUE = 'value'
+    DEVICE_ID = 'device_id'
 
     @staticmethod
     def get_values():

@@ -36,7 +36,9 @@ def construct_blueprint(settings):
             sensors = parameters[DeviceParameters.SENSORS.value]
             for sensor in sensors:
                 sensorParams = RequestValidator.validate_parameters(sensor,
-                                                                    SensorParameters.get_values(),
+                                                                    [SensorParameters.NAME.value,
+                                                                     SensorParameters.TYPE.value,
+                                                                     SensorParameters.VALUE.value],
                                                                     f'sensor "{sensor}"')
                 sensor = __add_sensor_if_not_exists(database, int(device['id']), sensorParams)
                 database.measurementAccess.add_measurement(int(sensor['id']),
