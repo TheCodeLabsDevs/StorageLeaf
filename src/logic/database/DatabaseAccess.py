@@ -5,6 +5,7 @@ from abc import ABC
 from enum import Enum
 
 from logic import Constants
+from logic.BackupService import BackupService
 
 LOGGER = logging.getLogger(Constants.APP_NAME)
 
@@ -13,6 +14,7 @@ class FetchType(Enum):
     NONE = 1
     ONE = 2
     ALL = 3
+    CREATE = 4
 
 
 class DatabaseAccess(ABC):
@@ -28,8 +30,9 @@ class DatabaseAccess(ABC):
             d[col[0]] = row[idx]
         return d
 
-    def __init__(self, databasePath):
+    def __init__(self, databasePath, backupService: BackupService):
         self._databasePath = databasePath
+        self._backupService = backupService
 
     @abc.abstractmethod
     def create_table(self):
@@ -48,5 +51,7 @@ class DatabaseAccess(ABC):
                     return cursor.fetchone()
                 if fetch_type == FetchType.ALL:
                     return cursor.fetchall()
+                if fetch_type == FetchType.NONE:
+                    self._backupService.perform_modification()
             finally:
                 cursor.close()

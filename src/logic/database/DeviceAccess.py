@@ -13,7 +13,7 @@ class DeviceAccess(DatabaseAccess):
     def create_table(self):
         self._query(f'''CREATE TABLE IF NOT EXISTS {self.TABLE_NAME} (
                             id INTEGER PRIMARY KEY AUTOINCREMENT, 
-                            name TEXT NOT NULL)''', fetch_type=FetchType.NONE)
+                            name TEXT NOT NULL)''', fetch_type=FetchType.CREATE)
 
     def get_all_devices(self) -> List[Dict[str, str]]:
         return self._query(f'SELECT * FROM {self.TABLE_NAME} ORDER BY name', fetch_type=FetchType.ALL)

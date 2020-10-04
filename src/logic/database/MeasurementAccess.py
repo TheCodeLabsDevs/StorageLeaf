@@ -16,7 +16,7 @@ class MeasurementAccess(DatabaseAccess):
                          id INTEGER PRIMARY KEY AUTOINCREMENT,
                          sensor_id INTEGER,
                          value TEXT NOT NULL,
-                         timestamp TEXT NOT NULL)''', fetch_type=FetchType.NONE)
+                         timestamp TEXT NOT NULL)''', fetch_type=FetchType.CREATE)
 
     def __get_current_datetime(self):
         return datetime.strftime(datetime.now(), self.DATE_FORMAT)

@@ -8,7 +8,16 @@
         "certfile": ""
     },
     "database": {
-        "databasePath": "storageLeaf.db"
+        "databasePath": "storageLeaf.db",
+        "backup":
+        {
+            "enable": true,
+            "maxModifications": 30,
+            "owncloudHost": "https://myowncloud.de",
+            "owncloudUser": "myUser",
+            "owncloudPassword": "",
+            "owncloudDestinationPath": "MyFolder"
+        }
     },
     "api": {
         "url": "http://localhost:10003",

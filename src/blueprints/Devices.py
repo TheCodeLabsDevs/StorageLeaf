@@ -1,27 +1,30 @@
+from typing import Dict
+
 from flask import Blueprint, jsonify, request
 
 from logic.AuthenticationWrapper import require_api_key
+from logic.BackupService import BackupService
 from logic.Parameters import DeviceParameters
 from logic.RequestValidator import RequestValidator, ValidationError
 from logic.database.Database import Database
 
 
-def construct_blueprint(settings):
+def construct_blueprint(settings: Dict, backupService: BackupService):
     devices = Blueprint('devices', __name__)
 
     @devices.route('/devices', methods=['GET'])
     def get_all_devices():
-        database = Database(settings['database']['databasePath'])
+        database = Database(settings['database']['databasePath'], backupService)
         return jsonify(database.deviceAccess.get_all_devices())
 
     @devices.route('/device/<int:deviceID>', methods=['GET'])
     def get_device(deviceID):
-        database = Database(settings['database']['databasePath'])
+        database = Database(settings['database']['databasePath'], backupService)
         return jsonify(database.deviceAccess.get_device(deviceID))
 
     @devices.route('/device/<int:deviceID>/sensors/', methods=['GET'])
     def get_all_sensors_for_device(deviceID):
-        database = Database(settings['database']['databasePath'])
+        database = Database(settings['database']['databasePath'], backupService)
         device = database.deviceAccess.get_device(deviceID)
         if not device:
             return jsonify({'success': False, 'msg': f'No device with id "{deviceID}" existing'})
@@ -31,7 +34,7 @@ def construct_blueprint(settings):
     @devices.route('/device/<int:deviceID>', methods=['DELETE'])
     @require_api_key(password=settings['api']['key'])
     def delete_device(deviceID):
-        database = Database(settings['database']['databasePath'])
+        database = Database(settings['database']['databasePath'], backupService)
         if not database.deviceAccess.get_device(deviceID):
             return jsonify({'success': False, 'msg': f'No device with id "{deviceID}" existing'})
 
@@ -49,7 +52,7 @@ def construct_blueprint(settings):
     def add_device():
         try:
             parameters = RequestValidator.validate(request, [DeviceParameters.DEVICE.value])
-            database = Database(settings['database']['databasePath'])
+            database = Database(settings['database']['databasePath'], backupService)
 
             deviceName = parameters[DeviceParameters.DEVICE.value]
             existingDevice = database.deviceAccess.get_device_by_name(deviceName)

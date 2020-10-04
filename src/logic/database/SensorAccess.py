@@ -15,7 +15,7 @@ class SensorAccess(DatabaseAccess):
                          id INTEGER PRIMARY KEY AUTOINCREMENT,
                          device_id INTEGER,
                          name TEXT NOT NULL, 
-                         type TEXT NOT NULL)''', fetch_type=FetchType.NONE)
+                         type TEXT NOT NULL)''', fetch_type=FetchType.CREATE)
 
     def get_all_sensors(self) -> List[Dict[str, str]]:
         return self._query(f'SELECT * FROM {self.TABLE_NAME} ORDER BY device_id, id', fetch_type=FetchType.ALL)
