@@ -1,5 +1,4 @@
 import logging
-from typing import Dict
 
 from logic import Constants
 from logic.BackupService import BackupService
