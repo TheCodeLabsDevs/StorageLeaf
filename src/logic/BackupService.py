@@ -36,10 +36,13 @@ class BackupService:
         return self._numberOfModifications >= self._maxModifications
 
     def backup(self):
-        LOGGER.info('Running backup...')
-        uploader = OwncloudUploader(self._owncloudHost, self._owncloudUser, self._owncloudPassword)
-        uploader.upload(self._owncloudDestinationPath, self._fileToBackup)
-        self.__reset()
+        try:
+            LOGGER.info('Running backup...')
+            uploader = OwncloudUploader(self._owncloudHost, self._owncloudUser, self._owncloudPassword)
+            uploader.upload(self._owncloudDestinationPath, self._fileToBackup)
+            self.__reset()
+        except Exception:
+            LOGGER.exception('Error performing backup')
 
     def perform_modification(self):
         self._numberOfModifications += 1
