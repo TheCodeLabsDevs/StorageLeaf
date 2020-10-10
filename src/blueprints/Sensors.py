@@ -22,17 +22,17 @@ def construct_blueprint(settings: Dict, backupService: BackupService):
         database = Database(settings['database']['databasePath'], backupService)
         return jsonify(database.sensorAccess.get_sensor(sensorID))
 
-    @sensors.route('/sensor/<int:sensorID>/measurements', methods=['GET'])
-    def get_all_measurements_for_sensor(sensorID):
+    @sensors.route('/sensor/<int:sensorID>/measurements/<int:limit>', methods=['GET'])
+    def get_all_measurements_for_sensor_with_limit(sensorID: int, limit: int):
         database = Database(settings['database']['databasePath'], backupService)
         sensor = database.sensorAccess.get_sensor(sensorID)
         if not sensor:
             return jsonify({'success': False, 'msg': f'No sensor with id "{sensorID}" existing'})
 
-        return jsonify(database.measurementAccess.get_all_measurements_for_sensor(sensorID))
+        return jsonify(database.measurementAccess.get_all_measurements_for_sensor(sensorID, limit))
 
     @sensors.route('/sensor/<int:sensorID>/measurements/latest', methods=['GET'])
-    def get_latest_measurements_for_sensor(sensorID):
+    def get_latest_measurements_for_sensor(sensorID: int):
         database = Database(settings['database']['databasePath'], backupService)
         sensor = database.sensorAccess.get_sensor(sensorID)
         if not sensor:

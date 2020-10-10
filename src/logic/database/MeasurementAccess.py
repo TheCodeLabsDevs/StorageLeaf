@@ -21,8 +21,12 @@ class MeasurementAccess(DatabaseAccess):
     def __get_current_datetime(self):
         return datetime.strftime(datetime.now(), self.DATE_FORMAT)
 
-    def get_all_measurements(self) -> List[Dict[str, str]]:
-        return self._query(f'SELECT * FROM {self.TABLE_NAME} ORDER BY sensor_id ASC, datetime(timestamp) DESC',
+    def get_all_measurements(self, limit: int) -> List[Dict[str, str]]:
+        limitParameter = ''
+        if limit > 0:
+            limitParameter = f'LIMIT {limit}'
+        return self._query(f'SELECT * FROM {self.TABLE_NAME} ORDER BY sensor_id ASC, '
+                           f'datetime(timestamp) DESC {limitParameter}',
                            fetch_type=FetchType.ALL)
 
     def get_measurement(self, measurementID: int) -> Dict[str, str] or None:
@@ -30,9 +34,12 @@ class MeasurementAccess(DatabaseAccess):
                            measurementID,
                            fetch_type=FetchType.ALL)
 
-    def get_all_measurements_for_sensor(self, sensorID: int) -> List[Dict[str, str]]:
+    def get_all_measurements_for_sensor(self, sensorID: int, limit: int) -> List[Dict[str, str]]:
+        limitParameter = ''
+        if limit > 0:
+            limitParameter = f'LIMIT {limit}'
         return self._query(f'SELECT * FROM {self.TABLE_NAME} WHERE sensor_id = ? '
-                           f'ORDER BY datetime(timestamp) DESC',
+                           f'ORDER BY datetime(timestamp) DESC {limitParameter}',
                            sensorID,
                            fetch_type=FetchType.ALL)
 

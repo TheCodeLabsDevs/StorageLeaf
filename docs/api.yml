@@ -194,16 +194,22 @@ paths:
               application/json:
                 schema:
                   $ref: '#/components/schemas/ErrorResponse'
-  /sensor/{sensorID}/measurements:
+  /sensor/{sensorID}/measurements/{limit}:
     get:
       tags:
         - sensor
-      summary: Gets all measurements for a specific sensor
+      summary: Gets all measurements for a specific sensor (Maximum number of results can be limited with parameter "limit". Set to "0" to disable limit.)
       operationId: sensorMeasurements
       parameters:
         - in: path
           name: sensorID
           description: The sensor id
+          required: true
+          schema:
+            type: integer
+        - in: path
+          name: limit
+          description: Maximum number of results.
           required: true
           schema:
             type: integer
@@ -267,12 +273,19 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /measurements:
+  /measurements/{limit}:
     get:
       tags:
         - measurement
-      summary: Gets all measurements
+      summary: Gets all measurements (Maximum number of results can be limited with parameter "limit". Set to "0" to disable limit.)
       operationId: measurements
+      parameters:
+        - in: path
+          name: limit
+          description: Maximum number of results.
+          required: true
+          schema:
+            type: integer
       responses:
         '200':
           description: All available measurements
@@ -282,6 +295,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Measurement'
+
+  /measurements:
     post:
       tags:
         - measurement

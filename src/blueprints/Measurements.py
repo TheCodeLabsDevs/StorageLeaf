@@ -12,10 +12,10 @@ from logic.database.Database import Database
 def construct_blueprint(settings: Dict, backupService: BackupService):
     measurements = Blueprint('measurements', __name__)
 
-    @measurements.route('/measurements', methods=['GET'])
-    def get_all_measurements():
+    @measurements.route('/measurements/<int:limit>', methods=['GET'])
+    def get_all_measurements(limit: int):
         database = Database(settings['database']['databasePath'], backupService)
-        return jsonify(database.measurementAccess.get_all_measurements())
+        return jsonify(database.measurementAccess.get_all_measurements(limit))
 
     @measurements.route('/measurement/<int:measurementID>', methods=['GET'])
     def get_measurement(measurementID):
