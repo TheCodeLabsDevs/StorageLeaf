@@ -17,6 +17,32 @@ def construct_blueprint(settings: Dict, backupService: BackupService):
         database = Database(settings['database']['databasePath'], backupService)
         return jsonify(database.measurementAccess.get_all_measurements(limit))
 
+    @measurements.route('/measurements/minMax', methods=['GET'])
+    def get_min_and_max_for_sensor_ids():
+        if 'sensorIds' not in request.args:
+            return jsonify({'message': 'Parameter "sensorIds" missing'}), 400
+
+        sensorIds = request.args.get('sensorIds').split(',')
+        database = Database(settings['database']['databasePath'], backupService)
+
+        values = []
+        for sensorId in sensorIds:
+            sensorId = int(sensorId)
+            latestValue = database.measurementAccess.get_latest_measurements_for_sensor(sensorId)
+            if latestValue:
+                values.append(float(latestValue['value']))
+
+        if values:
+            return jsonify({
+                'min': min(values),
+                'max': max(values)
+            })
+
+        return jsonify({
+            'min': None,
+            'max': None
+        })
+
     @measurements.route('/measurement/<int:measurementID>', methods=['GET'])
     def get_measurement(measurementID):
         database = Database(settings['database']['databasePath'], backupService)

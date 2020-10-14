@@ -10,6 +10,8 @@ info:
 paths:
   /version:
     get:
+      tags:
+        - general
       summary: Gets information about the server version
       operationId: version
       responses:
@@ -209,7 +211,7 @@ paths:
             type: integer
         - in: path
           name: limit
-          description: Maximum number of results.
+          description: Maximum number of results. Set to "0" to disable limit.
           required: true
           schema:
             type: integer
@@ -282,10 +284,37 @@ paths:
       parameters:
         - in: path
           name: limit
-          description: Maximum number of results.
+          description: Maximum number of results. Set to "0" to disable limit.
           required: true
           schema:
             type: integer
+      responses:
+        '200':
+          description: All available measurements
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Measurement'
+
+  /measurements/minMax:
+    get:
+      tags:
+        - measurement
+      summary: Gets the minimum and maximum values for the given sensor ids.
+      operationId: measurementsMinMax
+      parameters:
+        - in: query
+          name: sensorIds
+          description: The sensor ids to calculate the min and max value for.
+          required: true
+          style: form
+          explode: false
+          schema:
+            type: array
+            items:
+              type: integer
       responses:
         '200':
           description: All available measurements
