@@ -196,11 +196,11 @@ paths:
               application/json:
                 schema:
                   $ref: '#/components/schemas/ErrorResponse'
-  /sensor/{sensorID}/measurements/{limit}:
+  /sensor/{sensorID}/measurements:
     get:
       tags:
         - sensor
-      summary: Gets all measurements for a specific sensor (Maximum number of results can be limited with parameter "limit". Set to "0" to disable limit.)
+      summary: Gets all measurements for a specific sensor (Number of results can be limited by specifying a date range).
       operationId: sensorMeasurements
       parameters:
         - in: path
@@ -209,12 +209,22 @@ paths:
           required: true
           schema:
             type: integer
-        - in: path
-          name: limit
-          description: Maximum number of results. Set to "0" to disable limit.
-          required: true
+        - in: query
+          name: startDateTime
+          description: The start date and time of the date range that should be taken into account.
+          required: false
           schema:
-            type: integer
+            type: string
+            format: date-time
+            example: '2020-01-20 18:15:22'
+        - in: query
+          name: endDateTime
+          description: The end date and time of the date range that should be taken into account.
+          required: false
+          schema:
+            type: string
+            format: date-time
+            example: '2020-01-20 19:15:22'
       responses:
         '200':
           description: All available measurements
@@ -279,7 +289,7 @@ paths:
     get:
       tags:
         - measurement
-      summary: Gets all measurements (Number of results can be limited by specifying a date range)
+      summary: Gets all measurements (Number of results can be limited by specifying a date range).
       operationId: measurements
       parameters:
         - in: query
