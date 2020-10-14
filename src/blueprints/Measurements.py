@@ -12,25 +12,39 @@ from logic.database.Database import Database
 def construct_blueprint(settings: Dict, backupService: BackupService):
     measurements = Blueprint('measurements', __name__)
 
-    @measurements.route('/measurements/<int:limit>', methods=['GET'])
-    def get_all_measurements(limit: int):
+    @measurements.route('/measurements', methods=['GET'])
+    def get_all_measurements():
+        startDateTime = request.args.get('startDateTime')
+        endDateTime = request.args.get('endDateTime')
+
         database = Database(settings['database']['databasePath'], backupService)
-        return jsonify(database.measurementAccess.get_all_measurements(limit))
+        return jsonify(database.measurementAccess.get_all_measurements(startDateTime, endDateTime))
 
     @measurements.route('/measurements/minMax', methods=['GET'])
     def get_min_and_max_for_sensor_ids():
         if 'sensorIds' not in request.args:
             return jsonify({'message': 'Parameter "sensorIds" missing'}), 400
 
+        if 'startDateTime' not in request.args:
+            return jsonify({'message': 'Parameter "startDateTime" missing'}), 400
+
+        if 'endDateTime' not in request.args:
+            return jsonify({'message': 'Parameter "endDateTime" missing'}), 400
+
         sensorIds = request.args.get('sensorIds').split(',')
+        startDateTime = request.args.get('startDateTime')
+        endDateTime = request.args.get('endDateTime')
+
         database = Database(settings['database']['databasePath'], backupService)
 
         values = []
         for sensorId in sensorIds:
             sensorId = int(sensorId)
-            latestValue = database.measurementAccess.get_latest_measurements_for_sensor(sensorId)
-            if latestValue:
-                values.append(float(latestValue['value']))
+            measurementsForSensor = database.measurementAccess.get_all_measurements_for_sensor(sensorId,
+                                                                                               startDateTime,
+                                                                                               endDateTime)
+            for measurement in measurementsForSensor:
+                values.append(float(measurement['value']))
 
         if values:
             return jsonify({

@@ -275,46 +275,29 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /measurements/{limit}:
+  /measurements:
     get:
       tags:
         - measurement
-      summary: Gets all measurements (Maximum number of results can be limited with parameter "limit". Set to "0" to disable limit.)
+      summary: Gets all measurements (Number of results can be limited by specifying a date range)
       operationId: measurements
       parameters:
-        - in: path
-          name: limit
-          description: Maximum number of results. Set to "0" to disable limit.
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: All available measurements
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Measurement'
-
-  /measurements/minMax:
-    get:
-      tags:
-        - measurement
-      summary: Gets the minimum and maximum values for the given sensor ids.
-      operationId: measurementsMinMax
-      parameters:
         - in: query
-          name: sensorIds
-          description: The sensor ids to calculate the min and max value for.
-          required: true
-          style: form
-          explode: false
+          name: startDateTime
+          description: The start date and time of the date range that should be taken into account.
+          required: false
           schema:
-            type: array
-            items:
-              type: integer
+            type: string
+            format: date-time
+            example: '2020-01-20 18:15:22'
+        - in: query
+          name: endDateTime
+          description: The end date and time of the date range that should be taken into account.
+          required: false
+          schema:
+            type: string
+            format: date-time
+            example: '2020-01-20 19:15:22'
       responses:
         '200':
           description: All available measurements
@@ -324,15 +307,13 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Measurement'
-
-  /measurements:
     post:
       tags:
         - measurement
       summary: Adds multiple measurements. Non-existent device and sensors will be created automatically.
       operationId: addMeasurements
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
       requestBody:
         description: Measurements to add
         required: true
@@ -353,6 +334,50 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+
+  /measurements/minMax:
+    get:
+      tags:
+        - measurement
+      summary: Gets the minimum and maximum values for the given sensor ids.
+      operationId: measurementsMinMax
+      parameters:
+        - in: query
+          name: sensorIds
+          description: The sensor ids to calculate the min and max value for.
+          required: true
+          style: form
+          explode: false
+          schema:
+            type: array
+            items:
+              type: integer
+        - in: query
+          name: startDateTime
+          description: The start date and time of the date range that should be taken into account.
+          required: true
+          schema:
+            type: string
+            format: date-time
+            example: '2020-01-20 18:15:22'
+        - in: query
+          name: endDateTime
+          description: The end date and time of the date range that should be taken into account.
+          required: true
+          schema:
+            type: string
+            format: date-time
+            example: '2020-01-20 19:15:22'
+      responses:
+        '200':
+          description: All available measurements
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Measurement'
+
   /measurement/{measurementID}:
     get:
       tags:

@@ -21,12 +21,17 @@ class MeasurementAccess(DatabaseAccess):
     def __get_current_datetime(self):
         return datetime.strftime(datetime.now(), self.DATE_FORMAT)
 
-    def get_all_measurements(self, limit: int) -> List[Dict[str, str]]:
-        limitParameter = ''
-        if limit > 0:
-            limitParameter = f'LIMIT {limit}'
+    def get_all_measurements(self, startDateTime: str, endDateTime: str) -> List[Dict[str, str]]:
+        if startDateTime and endDateTime:
+            return self._query(f'SELECT * FROM {self.TABLE_NAME} WHERE '
+                               f'DATETIME(timestamp) BETWEEN DATETIME(?) AND DATETIME(?) '
+                               f'ORDER BY sensor_id ASC, datetime(timestamp) DESC',
+                               startDateTime,
+                               endDateTime,
+                               fetch_type=FetchType.ALL)
+
         return self._query(f'SELECT * FROM {self.TABLE_NAME} ORDER BY sensor_id ASC, '
-                           f'datetime(timestamp) DESC {limitParameter}',
+                           f'datetime(timestamp) DESC',
                            fetch_type=FetchType.ALL)
 
     def get_measurement(self, measurementID: int) -> Dict[str, str] or None:
@@ -34,12 +39,19 @@ class MeasurementAccess(DatabaseAccess):
                            measurementID,
                            fetch_type=FetchType.ALL)
 
-    def get_all_measurements_for_sensor(self, sensorID: int, limit: int) -> List[Dict[str, str]]:
-        limitParameter = ''
-        if limit > 0:
-            limitParameter = f'LIMIT {limit}'
-        return self._query(f'SELECT * FROM {self.TABLE_NAME} WHERE sensor_id = ? '
-                           f'ORDER BY datetime(timestamp) DESC {limitParameter}',
+    def get_all_measurements_for_sensor(self, sensorID: int,
+                                        startDateTime: str,
+                                        endDateTime: str) -> List[Dict[str, str]]:
+        if startDateTime and endDateTime:
+            return self._query(f'SELECT * FROM {self.TABLE_NAME} WHERE sensor_id = ? '
+                               f'AND DATETIME(timestamp) BETWEEN DATETIME(?) AND DATETIME(?) '
+                               f'ORDER BY datetime(timestamp) DESC',
+                               sensorID,
+                               startDateTime,
+                               endDateTime,
+                               fetch_type=FetchType.ALL)
+
+        return self._query(f'SELECT * FROM {self.TABLE_NAME} WHERE sensor_id = ? ORDER BY datetime(timestamp) DESC',
                            sensorID,
                            fetch_type=FetchType.ALL)
 
