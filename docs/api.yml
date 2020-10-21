@@ -215,7 +215,6 @@ paths:
           required: false
           schema:
             type: string
-            format: date-time
             example: '2020-01-20 18:15:22'
         - in: query
           name: endDateTime
@@ -223,7 +222,6 @@ paths:
           required: false
           schema:
             type: string
-            format: date-time
             example: '2020-01-20 19:15:22'
       responses:
         '200':
@@ -298,7 +296,6 @@ paths:
           required: false
           schema:
             type: string
-            format: date-time
             example: '2020-01-20 18:15:22'
         - in: query
           name: endDateTime
@@ -306,7 +303,6 @@ paths:
           required: false
           schema:
             type: string
-            format: date-time
             example: '2020-01-20 19:15:22'
       responses:
         '200':
@@ -368,7 +364,6 @@ paths:
           required: true
           schema:
             type: string
-            format: date-time
             example: '2020-01-20 18:15:22'
         - in: query
           name: endDateTime
@@ -376,7 +371,6 @@ paths:
           required: true
           schema:
             type: string
-            format: date-time
             example: '2020-01-20 19:15:22'
       responses:
         '200':
