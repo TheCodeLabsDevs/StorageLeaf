@@ -3,6 +3,10 @@
 Accepts sensor data and saves them into a database. The saved data can be accessed via api.  
 An interactive OpenAPI Swagger documentation can be accessed by opening the server url in your web browser (e.g. http://localhost:10003).
 
+## Commonly used sensor types
+- temperature
+- humidity
+
 ## Installation on Raspberry Pi Zero
 - pipenv is causing some problems
 - use pipenv 2018-11-26
