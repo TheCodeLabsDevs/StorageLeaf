@@ -1,4 +1,6 @@
-FROM python:3-buster
+FROM python:3.9-alpine
+
+RUN apk add --no-cache openssl-dev libffi-dev gcc musl-dev make
 
 RUN pip install pipenv
 COPY src /opt/StorageLeaf/src
