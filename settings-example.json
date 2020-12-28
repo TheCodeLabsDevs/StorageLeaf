@@ -22,5 +22,11 @@
     "api": {
         "url": "http://localhost:10003",
         "key": ""
+    },
+    "discovery": {
+        "discoveryPort": 9191,
+        "responsePort": 9192,
+        "requestMessage": "DISCOVER_STORAGELEAF_REQUEST",
+        "responseMessage": "DISCOVER_STORAGELEAF_RESPONSE"
     }
 }
