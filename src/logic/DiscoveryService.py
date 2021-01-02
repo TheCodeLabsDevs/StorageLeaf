@@ -29,14 +29,14 @@ class DiscoveryService:
 
             while not self._shouldStop:
                 try:
-                    data, ip = sock.recvfrom(1024)
+                    data, remoteIpAndPort = sock.recvfrom(1024)
                     data = data.strip()
-                    ip = ip[0]
+                    remoteIp, __port = remoteIpAndPort
 
                     if data.decode() == self._requestMessage:
-                        LOGGER.debug(f'Received discovery request from {ip}')
+                        LOGGER.debug(f'Received discovery request from {remoteIp}')
                         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as responseSock:
-                            responseSock.connect((ip, self._responsePort))
+                            responseSock.connect((remoteIp, self._responsePort))
                             response = f'{self._responseMessage};{self._apiPort}'
                             responseSock.sendall(response.encode())
                 except BaseException as e:
