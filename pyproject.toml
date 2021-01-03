@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "StorageLeaf"
+version = "1.5.0"
+description = "Accepts sensor data and saves them into a database. The saved data can be accessed via api."
+authors = ["TheCodeLabs <spam@thecodelabs.com>"]
+
+[[tool.poetry.source]]
+name = "TheCodeLabs"
+url = "https://pypi.thecodelabs.de"
+secondary = true
+
+[tool.poetry.dependencies]
+python = "^3.8"
+flask = "^1.1.2"
+gevent = "^20.9.0"
+TheCodeLabs-BaseUtils = "*"
+TheCodeLabs-FlaskUtils = "*"
+pyyaml = "^5.3.1"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
