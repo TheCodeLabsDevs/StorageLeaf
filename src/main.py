@@ -23,4 +23,4 @@ with open('../settings.json', 'r', encoding='UTF-8') as f:
     settings = json.load(f)
 
 if __name__ == '__main__':
-    uvicorn.run(app, host='0.0.0.0', port=8000)
+    uvicorn.run(app, host=settings['server']['listen'], port=settings['server']['port'])
