@@ -7,9 +7,13 @@ from logic.databaseNew import Models
 from logic.databaseNew.Database import engine
 from routers import DeviceRouter
 
+# create database tables
 Models.Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
+with open('version.json', 'r', encoding='UTF-8') as f:
+    version = json.load(f)['version']
+
+app = FastAPI(version=version['name'])
 app.include_router(DeviceRouter.router)
 
 with open('../settings.json', 'r', encoding='UTF-8') as f:
