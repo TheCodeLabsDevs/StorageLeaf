@@ -23,6 +23,11 @@ def create_device(db: Session, device: Schemas.DeviceCreate):
     return dbDevice
 
 
+def delete_device(db: Session, device: Schemas.Device):
+    db.delete(device)
+    db.commit()
+
+
 def get_sensors(db: Session, skip: int = 0, limit: int = 100):
     return db.query(Models.Sensor).offset(skip).limit(limit).all()
 

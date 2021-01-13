@@ -3,6 +3,10 @@ from typing import List
 from pydantic import BaseModel
 
 
+class Status(BaseModel):
+    message: str
+
+
 class SensorBase(BaseModel):
     id: int
     name: str

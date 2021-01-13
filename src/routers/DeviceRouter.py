@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from Dependencies import get_database
 from logic.databaseNew import Schemas, Crud
+from logic.databaseNew.Schemas import Status
 
 router = APIRouter(
     prefix='/device',
@@ -37,3 +38,15 @@ async def create_user(device: Schemas.DeviceCreate, db: Session = Depends(get_da
     if createdDevice:
         raise HTTPException(status_code=400, detail='Device with this name already exists')
     return Crud.create_device(db=db, device=device)
+
+
+@router.delete('/{deviceId}', response_model=Status,
+               summary='Gets a specific device',
+               responses={404: {'description': 'Device not found'}})
+async def read_device(deviceId: int, db: Session = Depends(get_database)):
+    device = Crud.get_device(db, deviceId=deviceId)
+    if device is None:
+        raise HTTPException(status_code=404, detail='Device not found')
+
+    Crud.delete_device(db, device)
+    return Status(message=f"Deleted device {device.id}")
