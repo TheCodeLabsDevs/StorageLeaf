@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
 from logic.databaseNew import Models, Schemas
@@ -65,8 +66,12 @@ def delete_sensor(db: Session, sensor: Schemas.Sensor):
 
 # ===== measurements =====
 
-def get_measurements(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(Models.Measurement).offset(skip).limit(limit).all()
+def get_measurements(db: Session, startDateTime: str, endDateTime: str):
+    if startDateTime and endDateTime:
+        return db.query(Models.Measurement).filter(and_(startDateTime <= Models.Measurement.timestamp,
+                                                        endDateTime >= Models.Measurement.timestamp)).all()
+
+    return db.query(Models.Measurement).all()
 
 
 def get_measurement(db: Session, measurementId: int):

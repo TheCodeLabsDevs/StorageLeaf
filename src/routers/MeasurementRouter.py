@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Query
 from sqlalchemy.orm import Session
 
 from Dependencies import get_database, check_api_key
@@ -14,9 +14,15 @@ router = APIRouter(
 
 
 @router.get('/', response_model=List[Schemas.Measurement],
-            summary='Gets all measurements')
-async def read_measurements(skip: int = 0, limit: int = 100, db: Session = Depends(get_database)):
-    return Crud.get_measurements(db, skip=skip, limit=limit)
+            summary='Gets all measurements (Number of results can be limited by specifying a date range).')
+async def read_measurements(startDateTime: str = Query('2020-01-20 18:15:22',
+                                                       description='The start date and time of the date range '
+                                                                   'that should be taken into account.'),
+                            endDateTime: str = Query('2020-01-20 19:15:22',
+                                                     description='The end date and time of the date range '
+                                                                 'that should be taken into account.'),
+                            db: Session = Depends(get_database)):
+    return Crud.get_measurements(db, startDateTime=startDateTime, endDateTime=endDateTime)
 
 
 @router.get('/{measurementId}', response_model=Schemas.Measurement,
