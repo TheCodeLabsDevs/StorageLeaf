@@ -3,7 +3,7 @@ import os
 from TheCodeLabs_BaseUtils.DefaultLogger import DefaultLogger
 from TheCodeLabs_FlaskUtils.FlaskBaseApp import FlaskBaseApp
 
-from blueprints import Routes, Devices, Sensors, Measurements
+from blueprints import Sensors, Measurements
 from logic import Constants
 from logic.BackupService import BackupService
 from logic.DiscoveryService import DiscoveryService
@@ -23,8 +23,6 @@ class StorageLeaf(FlaskBaseApp):
         self._discoveryService.start()
 
     def _register_blueprints(self, app):
-        app.register_blueprint(Routes.construct_blueprint(self._settings, self._version))
-        app.register_blueprint(Devices.construct_blueprint(self._settings, self._backupService))
         app.register_blueprint(Sensors.construct_blueprint(self._settings, self._backupService))
         app.register_blueprint(Measurements.construct_blueprint(self._settings, self._backupService))
         return app
