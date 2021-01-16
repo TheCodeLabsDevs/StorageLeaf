@@ -74,6 +74,15 @@ def get_measurements(db: Session, startDateTime: str, endDateTime: str):
     return db.query(Models.Measurement).all()
 
 
+def get_measurements_for_sensor(db: Session, startDateTime: str, endDateTime: str, sensorId: int):
+    if startDateTime and endDateTime:
+        return db.query(Models.Measurement).filter(and_(startDateTime <= Models.Measurement.timestamp,
+                                                        endDateTime >= Models.Measurement.timestamp,
+                                                        Models.Measurement.sensorId == sensorId)).all()
+
+    return db.query(Models.Measurement).filter(Models.Measurement.sensorId == sensorId).all()
+
+
 def get_measurement(db: Session, measurementId: int):
     return db.query(Models.Measurement).filter(Models.Measurement.id == measurementId).first()
 

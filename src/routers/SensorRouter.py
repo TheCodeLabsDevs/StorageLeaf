@@ -3,7 +3,7 @@ from typing import List
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 
-from Dependencies import get_database, check_api_key
+from Dependencies import get_database, check_api_key, START_DATE_TIME, END_DATE_TIME
 from logic.databaseNew import Schemas, Crud
 from logic.databaseNew.Schemas import Status
 
@@ -61,3 +61,17 @@ async def delete_sensor(sensorId: int, db: Session = Depends(get_database)):
 
     Crud.delete_sensor(db, sensor)
     return Status(message=f'Deleted sensor {sensor.id}')
+
+
+@router.get('/{sensorId}/measurements', response_model=List[Schemas.Measurement],
+            summary='Gets all measurements for a specific sensor',
+            description='Number of results can be limited by specifying a date range',
+            responses={404: {'description': 'Sensor not found'}})
+async def get_sensor_measurements(sensorId: int,
+                                  startDateTime: str = START_DATE_TIME,
+                                  endDateTime: str = END_DATE_TIME,
+                                  db: Session = Depends(get_database)):
+    sensor = Crud.get_sensor(db, sensorId=sensorId)
+    if sensor is None:
+        raise HTTPException(status_code=404, detail='Sensor not found')
+    return Crud.get_measurements_for_sensor(db, startDateTime, endDateTime, sensorId)
