@@ -1,7 +1,7 @@
 from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
-from logic.databaseNew.Database import Base
+from logic.database.Database import Base
 
 
 class Device(Base):

@@ -5,7 +5,7 @@ from fastapi.security import APIKeyHeader
 from starlette.status import HTTP_403_FORBIDDEN
 
 from Settings import SETTINGS
-from logic.databaseNew.Database import SessionLocal
+from logic.database.Database import SessionLocal
 
 
 def get_database():

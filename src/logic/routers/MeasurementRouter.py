@@ -4,8 +4,8 @@ from fastapi import APIRouter, HTTPException, Depends, Query
 from sqlalchemy.orm import Session
 
 from Dependencies import get_database, check_api_key, START_DATE_TIME, END_DATE_TIME
-from logic.databaseNew import Schemas, Crud
-from logic.databaseNew.Schemas import Status, MinMax
+from logic.database import Schemas, Crud
+from logic.database.Schemas import Status, MinMax
 
 router = APIRouter(tags=['measurement'])
 

@@ -7,8 +7,8 @@ from starlette.responses import RedirectResponse
 
 from Settings import SETTINGS
 from logic import Constants
-from logic.databaseNew import Models, Schemas
-from logic.databaseNew.Database import engine
+from logic.database import Models, Schemas
+from logic.database.Database import engine
 from logic.routers import DeviceRouter
 from logic.routers import SensorRouter, MeasurementRouter
 

@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from Settings import SETTINGS
 from logic.BackupService import BackupService
-from logic.databaseNew import Models, Schemas
+from logic.database import Models, Schemas
 
 DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
 

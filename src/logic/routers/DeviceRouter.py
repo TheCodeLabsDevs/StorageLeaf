@@ -4,8 +4,8 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 
 from Dependencies import get_database, check_api_key
-from logic.databaseNew import Schemas, Crud
-from logic.databaseNew.Schemas import Status
+from logic.database import Schemas, Crud
+from logic.database.Schemas import Status
 
 router = APIRouter(
     prefix='/device',
