@@ -1,9 +1,10 @@
 import json
+import os
 
 import uvicorn
 from TheCodeLabs_BaseUtils.DefaultLogger import DefaultLogger
 from fastapi import FastAPI
-from starlette.responses import RedirectResponse
+from starlette.responses import RedirectResponse, FileResponse
 
 from Settings import SETTINGS
 from logic import Constants
@@ -35,8 +36,7 @@ async def root():
 
 @app.get('/favicon.ico', include_in_schema=False)
 def favicon():
-    return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico',
-                               mimetype='image/vnd.microsoft.icon')
+    return FileResponse(os.path.join(app.root_path, 'static', 'favicon.ico'), media_type='image/vnd.microsoft.icon')
 
 
 @app.get('/version',
