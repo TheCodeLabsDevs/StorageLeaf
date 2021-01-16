@@ -86,21 +86,4 @@ def construct_blueprint(settings: Dict, backupService: BackupService):
         database.sensorAccess.add_sensor(deviceID, sensorName, sensorType)
         return database.sensorAccess.get_sensor_by_name_and_device_id(deviceID, sensorName)
 
-    @measurements.route('/measurement', methods=['POST'])
-    @require_api_key(password=settings['api']['key'])
-    def add_single_measurement():
-        try:
-            parameters = RequestValidator.validate(request, MeasurementParameters.get_values())
-            database = Database(settings['database']['databasePath'], backupService)
-
-            sensorID = parameters[MeasurementParameters.SENSOR_ID.value]
-            if not database.sensorAccess.get_sensor(sensorID):
-                return jsonify({'success': False, 'msg': f'No sensor with id "{sensorID}" existing'})
-
-            database.measurementAccess.add_measurement(sensorID, parameters[SensorParameters.VALUE.value])
-        except ValidationError as e:
-            return e.response, 400
-
-        return jsonify({'success': True})
-
     return measurements
