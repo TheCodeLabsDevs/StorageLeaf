@@ -2,10 +2,13 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-SQLALCHEMY_DATABASE_URL = 'sqlite:///../../storageLeaf_new.db'
+from Settings import SETTINGS
+
+databasePath = SETTINGS['database']['databasePath']
+databaseUrl = f'sqlite:///{databasePath}'
 
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, connect_args={'check_same_thread': False}
+    databaseUrl, connect_args={'check_same_thread': False}
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

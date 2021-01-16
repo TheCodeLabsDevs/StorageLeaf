@@ -4,6 +4,7 @@ import uvicorn
 from fastapi import FastAPI
 from starlette.responses import RedirectResponse, JSONResponse
 
+from Settings import SETTINGS
 from logic import Constants
 from logic.databaseNew import Models
 from logic.databaseNew.Database import engine
@@ -14,11 +15,6 @@ Models.Base.metadata.create_all(bind=engine)
 
 with open('version.json', 'r', encoding='UTF-8') as f:
     versionInfo = json.load(f)['version']
-
-with open('../settings.json', 'r', encoding='UTF-8') as f:
-    settings = json.load(f)
-
-API_KEY = settings['api']['key']
 
 app = FastAPI(title=Constants.APP_NAME,
               version=versionInfo['name'],
@@ -36,4 +32,4 @@ async def version():
     return JSONResponse(content=versionInfo)
 
 if __name__ == '__main__':
-    uvicorn.run(app, host=settings['server']['listen'], port=settings['server']['port'])
+    uvicorn.run(app, host=SETTINGS['server']['listen'], port=SETTINGS['server']['port'])
