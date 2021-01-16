@@ -25,7 +25,7 @@ async def check_api_key(apiKey: str = Security(API_KEY_HEADER)):
         raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail='apiKey invalid')
 
 
-START_DATE_TIME: str = Query('2021-01-16 18:15:22',
+START_DATE_TIME: str = Query(default='2021-01-16 18:15:22',
                              description='The start date and time of the date range that should be taken into account.')
-END_DATE_TIME: str = Query('2021-01-16 19:15:22',
+END_DATE_TIME: str = Query(default='2021-01-16 19:15:22',
                            description='The end date and time of the date range that should be taken into account.')

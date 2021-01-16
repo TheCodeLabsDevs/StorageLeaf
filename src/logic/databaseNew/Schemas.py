@@ -7,6 +7,11 @@ class Status(BaseModel):
     message: str
 
 
+class MinMax(BaseModel):
+    min: float or None
+    max: float or None
+
+
 # ===== measurement =====
 class Measurement(BaseModel):
     id: int
