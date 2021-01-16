@@ -7,6 +7,22 @@ class Status(BaseModel):
     message: str
 
 
+# ===== measurement =====
+class Measurement(BaseModel):
+    id: int
+    value: str
+    timestamp: str
+    sensorId: int
+
+    class Config:
+        orm_mode = True
+
+
+class MeasurementCreate(BaseModel):
+    value: str
+    sensorId: int
+
+
 # ===== sensor =====
 class SensorBase(BaseModel):
     id: int
@@ -23,7 +39,7 @@ class SensorCreate(BaseModel):
     deviceId: int
 
 
-class Sensor(BaseModel):
+class Sensor(SensorBase):
     id: int
     name: str
     type: str
@@ -34,17 +50,14 @@ class Sensor(BaseModel):
 
 
 # ===== device =====
-class DeviceBase(BaseModel):
+class Device(BaseModel):
     id: int
     name: str
-
-
-class DeviceCreate(BaseModel):
-    name: str
-
-
-class Device(DeviceBase):
     sensors: List[SensorBase]
 
     class Config:
         orm_mode = True
+
+
+class DeviceCreate(BaseModel):
+    name: str

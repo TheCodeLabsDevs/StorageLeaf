@@ -1,6 +1,10 @@
+from datetime import datetime
+
 from sqlalchemy.orm import Session
 
 from logic.databaseNew import Models, Schemas
+
+DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
 
 
 # ===== devices =====
@@ -57,3 +61,30 @@ def create_sensor(db: Session, sensor: Schemas.SensorCreate):
 def delete_sensor(db: Session, sensor: Schemas.Sensor):
     db.delete(sensor)
     db.commit()
+
+
+# ===== measurements =====
+
+def get_measurements(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(Models.Measurement).offset(skip).limit(limit).all()
+
+
+def get_measurement(db: Session, measurementId: int):
+    return db.query(Models.Measurement).filter(Models.Measurement.id == measurementId).first()
+
+
+def create_measurement(db: Session, measurement: Schemas.MeasurementCreate):
+    dbMeasurement = Models.Measurement(**measurement.dict(), timestamp=__get_current_datetime())
+    db.add(dbMeasurement)
+    db.commit()
+    db.refresh(dbMeasurement)
+    return dbMeasurement
+
+
+def delete_measurement(db: Session, measurement: Schemas.Measurement):
+    db.delete(measurement)
+    db.commit()
+
+
+def __get_current_datetime():
+    return datetime.strftime(datetime.now(), DATE_FORMAT)

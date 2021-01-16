@@ -9,7 +9,7 @@ from Settings import SETTINGS
 from logic import Constants
 from logic.databaseNew import Models
 from logic.databaseNew.Database import engine
-from routers import DeviceRouter, SensorRouter
+from routers import DeviceRouter, SensorRouter, MeasurementRouter
 
 LOGGER = DefaultLogger().create_logger_if_not_exists(Constants.APP_NAME)
 
@@ -25,6 +25,7 @@ app = FastAPI(title=Constants.APP_NAME,
               servers=[{'url': SETTINGS['api']['url'], 'description': f'{Constants.APP_NAME} API'}])
 app.include_router(DeviceRouter.router)
 app.include_router(SensorRouter.router)
+app.include_router(MeasurementRouter.router)
 
 
 @app.get('/')
