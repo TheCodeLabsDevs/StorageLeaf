@@ -75,3 +75,13 @@ async def get_sensor_measurements(sensorId: int,
     if sensor is None:
         raise HTTPException(status_code=404, detail='Sensor not found')
     return Crud.get_measurements_for_sensor(db, startDateTime, endDateTime, sensorId)
+
+
+@router.get('/{sensorId}/measurements/latest', response_model=Schemas.Measurement,
+            summary='Gets the latest measurement for a specific sensor',
+            responses={404: {'description': 'Sensor not found'}})
+async def get_latest_measurements_for_sensor(sensorId: int, db: Session = Depends(get_database)):
+    sensor = Crud.get_sensor(db, sensorId=sensorId)
+    if sensor is None:
+        raise HTTPException(status_code=404, detail='Sensor not found')
+    return Crud.get_latest_measurement_for_sensor(db, sensorId)

@@ -83,6 +83,13 @@ def get_measurements_for_sensor(db: Session, startDateTime: str, endDateTime: st
     return db.query(Models.Measurement).filter(Models.Measurement.sensorId == sensorId).all()
 
 
+def get_latest_measurement_for_sensor(db: Session, sensorId: int):
+    return db.query(Models.Measurement) \
+        .filter(Models.Measurement.sensorId == sensorId) \
+        .order_by(Models.Measurement.timestamp.desc()) \
+        .first()
+
+
 def get_measurement(db: Session, measurementId: int):
     return db.query(Models.Measurement).filter(Models.Measurement.id == measurementId).first()
 
