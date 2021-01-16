@@ -9,7 +9,7 @@ from Settings import SETTINGS
 from logic import Constants
 from logic.databaseNew import Models
 from logic.databaseNew.Database import engine
-from routers import DeviceRouter
+from routers import DeviceRouter, SensorRouter
 
 LOGGER = DefaultLogger().create_logger_if_not_exists(Constants.APP_NAME)
 
@@ -24,6 +24,7 @@ app = FastAPI(title=Constants.APP_NAME,
               description='The StorageLeaf API',
               servers=[{'url': SETTINGS['api']['url'], 'description': f'{Constants.APP_NAME} API'}])
 app.include_router(DeviceRouter.router)
+app.include_router(SensorRouter.router)
 
 
 @app.get('/')

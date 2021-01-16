@@ -9,8 +9,7 @@ from logic.databaseNew.Schemas import Status
 
 router = APIRouter(
     prefix='/device',
-    tags=['device'],
-    responses={404: {'description': 'Not found'}},
+    tags=['device']
 )
 
 
@@ -42,7 +41,8 @@ async def create_device(device: Schemas.DeviceCreate, db: Session = Depends(get_
 
 
 @router.delete('/{deviceId}', response_model=Status,
-               summary='Gets a specific device',
+               summary='Deletes a specific device',
+               description='All corresponding sensors and measurements will be deleted too.',
                responses={404: {'description': 'Device not found'}},
                dependencies=[Depends(check_api_key)])
 async def delete_device(deviceId: int, db: Session = Depends(get_database)):

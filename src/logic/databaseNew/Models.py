@@ -10,7 +10,7 @@ class Device(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, unique=True, index=True, nullable=False)
 
-    sensors = relationship('Sensor', back_populates='device')
+    sensors = relationship('Sensor', back_populates='device', cascade='all,delete')
 
 
 class Sensor(Base):
