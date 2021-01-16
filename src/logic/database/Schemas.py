@@ -1,6 +1,6 @@
 from typing import List
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 # ===== special =====
@@ -41,7 +41,7 @@ class Measurement(BaseModel):
 
 
 class MeasurementCreate(BaseModel):
-    value: str
+    value: str = Field(..., min_length=1)
     sensorId: int
 
 
@@ -56,14 +56,14 @@ class SensorBase(BaseModel):
 
 
 class SensorCreate(BaseModel):
-    name: str
-    type: str
+    name: str = Field(..., min_length=1)
+    type: str = Field(..., min_length=1)
     deviceId: int
 
 
 class SensorUpdate(BaseModel):
-    name: str
-    type: str
+    name: str = Field(..., min_length=1)
+    type: str = Field(..., min_length=1)
 
 
 class Sensor(SensorBase):
@@ -87,7 +87,7 @@ class Device(BaseModel):
 
 
 class DeviceCreate(BaseModel):
-    name: str
+    name: str = Field(..., min_length=1)
 
 
 # ===== send multiple measurements =====
