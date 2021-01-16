@@ -31,7 +31,7 @@ def get_devices(db: Session, skip: int = 0, limit: int = 100):
     return db.query(Models.Device).offset(skip).limit(limit).all()
 
 
-def get_device(db: Session, deviceId: int):
+def get_device(db: Session, deviceId: int) -> Models.Device:
     return db.query(Models.Device).filter(Models.Device.id == deviceId).first()
 
 
@@ -46,6 +46,15 @@ def create_device(db: Session, device: Schemas.DeviceCreate):
     db.commit()
     db.refresh(dbDevice)
     return dbDevice
+
+
+@notify_backup_service(BACKUP_SERVICE)
+def update_device(db: Session, deviceId: int, device: Schemas.DeviceCreate):
+    existingDevice = get_device(db, deviceId)
+    existingDevice.name = device.name
+    db.commit()
+    db.refresh(existingDevice)
+    return existingDevice
 
 
 @notify_backup_service(BACKUP_SERVICE)

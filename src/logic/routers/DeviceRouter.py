@@ -40,6 +40,17 @@ async def create_device(device: Schemas.DeviceCreate, db: Session = Depends(get_
     return Crud.create_device(db=db, device=device)
 
 
+@router.put('/{deviceId}', response_model=Schemas.Device,
+            summary='Updates a  device',
+            responses={404: {'description': 'Device not found'}},
+            dependencies=[Depends(check_api_key)])
+async def update_device(deviceId: int, device: Schemas.DeviceCreate, db: Session = Depends(get_database)):
+    createdDevice = Crud.get_device_by_name(db, device.name)
+    if createdDevice:
+        raise HTTPException(status_code=404, detail='Device not found')
+    return Crud.update_device(db=db, deviceId=deviceId, device=device)
+
+
 @router.delete('/{deviceId}', response_model=Status,
                summary='Deletes a specific device',
                description='All corresponding sensors and measurements will be deleted too.',
