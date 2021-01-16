@@ -1,9 +1,9 @@
 from typing import List
 
-from fastapi import APIRouter, HTTPException, Depends, Query
+from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 
-from Dependencies import get_database, check_api_key
+from Dependencies import get_database, check_api_key, START_DATE_TIME, END_DATE_TIME
 from logic.databaseNew import Schemas, Crud
 from logic.databaseNew.Schemas import Status
 
@@ -14,13 +14,10 @@ router = APIRouter(
 
 
 @router.get('/', response_model=List[Schemas.Measurement],
-            summary='Gets all measurements (Number of results can be limited by specifying a date range).')
-async def read_measurements(startDateTime: str = Query('2020-01-20 18:15:22',
-                                                       description='The start date and time of the date range '
-                                                                   'that should be taken into account.'),
-                            endDateTime: str = Query('2020-01-20 19:15:22',
-                                                     description='The end date and time of the date range '
-                                                                 'that should be taken into account.'),
+            summary='Gets all measurements',
+            description='Number of results can be limited by specifying a date range')
+async def read_measurements(startDateTime: str = START_DATE_TIME,
+                            endDateTime: str = END_DATE_TIME,
                             db: Session = Depends(get_database)):
     return Crud.get_measurements(db, startDateTime=startDateTime, endDateTime=endDateTime)
 
