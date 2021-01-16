@@ -34,11 +34,6 @@ class MeasurementAccess(DatabaseAccess):
                            f'datetime(timestamp) DESC',
                            fetch_type=FetchType.ALL)
 
-    def get_measurement(self, measurementID: int) -> Dict[str, str] or None:
-        return self._query(f'SELECT * FROM {self.TABLE_NAME} WHERE id = ?',
-                           measurementID,
-                           fetch_type=FetchType.ALL)
-
     def get_all_measurements_for_sensor(self, sensorID: int,
                                         startDateTime: str,
                                         endDateTime: str) -> List[Dict[str, str]]:
@@ -61,16 +56,3 @@ class MeasurementAccess(DatabaseAccess):
                            sensorID,
                            fetch_type=FetchType.ONE)
 
-    def add_measurement(self, sensorID: int, value: str):
-        LOGGER.debug(f'Inserting new measurement for sensor "{sensorID}" (value: "{value}")')
-        self._query(f'INSERT INTO {self.TABLE_NAME}(sensor_id, value, timestamp ) VALUES(?, ?, ?)',
-                    sensorID, value, self.__get_current_datetime(),
-                    fetch_type=FetchType.NONE)
-
-    def delete_measurement(self, measurementID: int):
-        LOGGER.debug(f'Deleting measurement "{measurementID}"')
-        self._query(f'DELETE FROM {self.TABLE_NAME} WHERE id = ?', measurementID, fetch_type=FetchType.NONE)
-
-    def delete_measurements_for_sensor(self, sensorID: int):
-        LOGGER.debug(f'Deleting all measurement for sensor "{sensorID}"')
-        self._query(f'DELETE FROM {self.TABLE_NAME} WHERE sensor_id = ?', sensorID, fetch_type=FetchType.NONE)
