@@ -21,11 +21,12 @@ with open('version.json', 'r', encoding='UTF-8') as f:
 
 app = FastAPI(title=Constants.APP_NAME,
               version=VERSION['name'],
-              description='The StorageLeaf API')
+              description='The StorageLeaf API',
+              servers=[{'url': SETTINGS['api']['url'], 'description': f'{Constants.APP_NAME} API'}])
 app.include_router(DeviceRouter.router)
 
 
-@app.get("/")
+@app.get('/')
 async def root():
     return RedirectResponse(url='/docs')
 
