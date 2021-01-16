@@ -66,3 +66,16 @@ class Device(BaseModel):
 
 class DeviceCreate(BaseModel):
     name: str
+
+
+# ===== send multiple measurements =====
+
+class SensorValue(BaseModel):
+    name: str
+    type: str
+    value: str
+
+
+class MultipleMeasurements(BaseModel):
+    deviceName: str
+    sensors: List[SensorValue]

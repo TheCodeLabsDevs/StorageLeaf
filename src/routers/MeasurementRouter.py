@@ -71,3 +71,24 @@ async def get_min_and_max_for_sensor_ids(sensorIds: List[int] = Query(None),
         return MinMax(min=min(values), max=max(values))
 
     return MinMax(min=None, max=None)
+
+
+@router.post('/measurements/', response_model=Schemas.Status,
+             summary='Adds multiple measurements',
+             description='Non-existent device and sensors will be created automatically',
+             dependencies=[Depends(check_api_key)])
+async def create_multiple_measurements(measurementsToAdd: Schemas.MultipleMeasurements,
+                                       db: Session = Depends(get_database)):
+    existingDevice = Crud.get_device_by_name(db, measurementsToAdd.deviceName)
+    if not existingDevice:
+        existingDevice = Crud.create_device(db, Schemas.DeviceCreate(name=measurementsToAdd.deviceName))
+
+    for sensor in measurementsToAdd.sensors:
+        existingSensor = Crud.get_sensor_by_name_and_device_id(db, sensor.name, existingDevice.id)
+        if not existingSensor:
+            existingSensor = Crud.create_sensor(db, Schemas.SensorCreate(name=sensor.name,
+                                                                         type=sensor.type,
+                                                                         devideId=existingDevice.id))
+        Crud.create_measurement(db, Schemas.MeasurementCreate(value=sensor.value, sensorId=existingSensor.id))
+
+    return Status(message=f'Success')
