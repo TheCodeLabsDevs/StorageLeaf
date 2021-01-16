@@ -3,7 +3,7 @@ from typing import List
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 
-from Dependencies import get_database, check_api_key, START_DATE_TIME, END_DATE_TIME
+from logic.Dependencies import get_database, check_api_key, START_DATE_TIME, END_DATE_TIME
 from logic.database import Schemas, Crud
 from logic.database.Schemas import Status
 
