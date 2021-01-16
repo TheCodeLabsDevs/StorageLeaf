@@ -19,7 +19,7 @@ class Sensor(Base):
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     name = Column(String, index=True, nullable=False)
     type = Column(String, index=True, nullable=False)
-    deviceId = Column(Integer, ForeignKey('device.id'))
+    device_id = Column(Integer, ForeignKey('device.id'))
 
     device = relationship('Device', back_populates='sensors')
     measurements = relationship('Measurement', back_populates='sensor', cascade='all,delete')
@@ -31,6 +31,6 @@ class Measurement(Base):
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     timestamp = Column(String, index=True, nullable=False)
     value = Column(String, index=True, nullable=False)
-    sensorId = Column(Integer, ForeignKey('sensor.id'))
+    sensor_id = Column(Integer, ForeignKey('sensor.id'))
 
     sensor = relationship('Sensor', back_populates='measurements')

@@ -76,7 +76,7 @@ def get_sensor(db: Session, sensorId: int) -> Models.Sensor:
 
 def get_sensor_by_name_and_device_id(db: Session, sensorName: str, deviceId: int) -> Models.Sensor:
     return db.query(Models.Sensor).filter(and_(Models.Sensor.name == sensorName,
-                                               Models.Sensor.deviceId == deviceId)).first()
+                                               Models.Sensor.device_id == deviceId)).first()
 
 
 @notify_backup_service(BACKUP_SERVICE)
@@ -119,14 +119,14 @@ def get_measurements_for_sensor(db: Session, startDateTime: str,
     if startDateTime and endDateTime:
         return db.query(Models.Measurement).filter(and_(startDateTime <= Models.Measurement.timestamp,
                                                         endDateTime >= Models.Measurement.timestamp,
-                                                        Models.Measurement.sensorId == sensorId)).all()
+                                                        Models.Measurement.sensor_id == sensorId)).all()
 
-    return db.query(Models.Measurement).filter(Models.Measurement.sensorId == sensorId).all()
+    return db.query(Models.Measurement).filter(Models.Measurement.sensor_id == sensorId).all()
 
 
 def get_latest_measurement_for_sensor(db: Session, sensorId: int) -> Models.Measurement:
     return db.query(Models.Measurement) \
-        .filter(Models.Measurement.sensorId == sensorId) \
+        .filter(Models.Measurement.sensor_id == sensorId) \
         .order_by(Models.Measurement.timestamp.desc()) \
         .first()
 

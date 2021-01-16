@@ -31,12 +31,12 @@ async def read_measurement(measurementId: int, db: Session = Depends(get_databas
 
 @router.post('/measurement/', response_model=Schemas.Measurement,
              summary='Adds a new measurement',
-             responses={404: {'description': 'No sensor with id "{measurement.sensorId}" existing'}},
+             responses={404: {'description': 'No sensor with id "{measurement.sensor_id}" existing'}},
              dependencies=[Depends(check_api_key)])
 async def create_measurement(measurement: Schemas.MeasurementCreate, db: Session = Depends(get_database)):
-    existingSensor = Crud.get_sensor(db, measurement.sensorId)
+    existingSensor = Crud.get_sensor(db, measurement.sensor_id)
     if not existingSensor:
-        raise HTTPException(status_code=404, detail=f'No sensor with id "{measurement.sensorId}" existing')
+        raise HTTPException(status_code=404, detail=f'No sensor with id "{measurement.sensor_id}" existing')
 
     return Crud.create_measurement(db=db, measurement=measurement)
 

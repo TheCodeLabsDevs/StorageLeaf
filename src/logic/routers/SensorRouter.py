@@ -32,19 +32,19 @@ async def read_sensor(sensorId: int, db: Session = Depends(get_database)):
 @router.post('/', response_model=Schemas.Sensor,
              summary='Adds a new sensor',
              responses={400: {'description': 'A sensor called "{sensor.name}" already exists '
-                                             '(ID: {existingSensor.id}) for device {sensor.deviceId}'},
-                        404: {'description': 'No device with id "{sensor.deviceId}" existing'}},
+                                             '(ID: {existingSensor.id}) for device {sensor.device_id}'},
+                        404: {'description': 'No device with id "{sensor.device_id}" existing'}},
              dependencies=[Depends(check_api_key)])
 async def create_sensor(sensor: Schemas.SensorCreate, db: Session = Depends(get_database)):
-    existingDevice = Crud.get_device(db, sensor.deviceId)
+    existingDevice = Crud.get_device(db, sensor.device_id)
     if not existingDevice:
-        raise HTTPException(status_code=404, detail=f'No device with id "{sensor.deviceId}" existing')
+        raise HTTPException(status_code=404, detail=f'No device with id "{sensor.device_id}" existing')
 
-    existingSensor = Crud.get_sensor_by_name_and_device_id(db, sensor.name, sensor.deviceId)
+    existingSensor = Crud.get_sensor_by_name_and_device_id(db, sensor.name, sensor.device_id)
     if existingSensor:
         raise HTTPException(status_code=400,
                             detail=f'A sensor called "{sensor.name}" already exists '
-                                   f'(ID: {existingSensor.id}) for device {sensor.deviceId}')
+                                   f'(ID: {existingSensor.id}) for device {sensor.device_id}')
 
     return Crud.create_sensor(db=db, sensor=sensor)
 
@@ -59,11 +59,11 @@ async def update_device(sensorId: int, sensor: Schemas.SensorUpdate, db: Session
         raise HTTPException(status_code=404, detail='Sensor not found')
 
     if sensorToUpdate.name != sensor.name:
-        existingSensor = Crud.get_sensor_by_name_and_device_id(db, sensor.name, sensorToUpdate.deviceId)
+        existingSensor = Crud.get_sensor_by_name_and_device_id(db, sensor.name, sensorToUpdate.device_id)
         if existingSensor:
             raise HTTPException(status_code=400,
                                 detail=f'A sensor called "{sensor.name}" already exists '
-                                       f'(ID: {existingSensor.id}) for device {sensorToUpdate.deviceId}')
+                                       f'(ID: {existingSensor.id}) for device {sensorToUpdate.device_id}')
 
     return Crud.update_sensor(db=db, sensorId=sensorId, sensor=sensor)
 

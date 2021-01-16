@@ -34,7 +34,7 @@ class Measurement(BaseModel):
     id: int
     value: str
     timestamp: str
-    sensorId: int
+    sensor_id: int
 
     class Config:
         orm_mode = True
@@ -42,7 +42,7 @@ class Measurement(BaseModel):
 
 class MeasurementCreate(BaseModel):
     value: str = Field(..., min_length=1)
-    sensorId: int
+    sensor_id: int
 
 
 # ===== sensor =====
@@ -58,7 +58,7 @@ class SensorBase(BaseModel):
 class SensorCreate(BaseModel):
     name: str = Field(..., min_length=1)
     type: str = Field(..., min_length=1)
-    deviceId: int
+    device_id: int
 
 
 class SensorUpdate(BaseModel):
@@ -70,7 +70,7 @@ class Sensor(SensorBase):
     id: int
     name: str
     type: str
-    deviceId: int
+    device_id: int
 
     class Config:
         orm_mode = True
