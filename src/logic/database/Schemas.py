@@ -61,6 +61,11 @@ class SensorCreate(BaseModel):
     deviceId: int
 
 
+class SensorUpdate(BaseModel):
+    name: str
+    type: str
+
+
 class Sensor(SensorBase):
     id: int
     name: str

@@ -88,6 +88,16 @@ def create_sensor(db: Session, sensor: Schemas.SensorCreate):
 
 
 @notify_backup_service(BACKUP_SERVICE)
+def update_sensor(db: Session, sensorId: int, sensor: Schemas.SensorUpdate):
+    existingSensor = get_sensor(db, sensorId)
+    existingSensor.name = sensor.name
+    existingSensor.type = sensor.type
+    db.commit()
+    db.refresh(existingSensor)
+    return existingSensor
+
+
+@notify_backup_service(BACKUP_SERVICE)
 def delete_sensor(db: Session, sensor: Schemas.Sensor):
     db.delete(sensor)
     db.commit()

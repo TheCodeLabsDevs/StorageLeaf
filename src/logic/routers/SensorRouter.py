@@ -49,6 +49,25 @@ async def create_sensor(sensor: Schemas.SensorCreate, db: Session = Depends(get_
     return Crud.create_sensor(db=db, sensor=sensor)
 
 
+@router.put('/{sensorId}', response_model=Schemas.Sensor,
+            summary='Updates a sensor',
+            responses={404: {'description': 'Sensor not found'}},
+            dependencies=[Depends(check_api_key)])
+async def update_device(sensorId: int, sensor: Schemas.SensorUpdate, db: Session = Depends(get_database)):
+    sensorToUpdate = Crud.get_sensor(db, sensorId)
+    if not sensorToUpdate:
+        raise HTTPException(status_code=404, detail='Sensor not found')
+
+    if sensorToUpdate.name != sensor.name:
+        existingSensor = Crud.get_sensor_by_name_and_device_id(db, sensor.name, sensorToUpdate.deviceId)
+        if existingSensor:
+            raise HTTPException(status_code=400,
+                                detail=f'A sensor called "{sensor.name}" already exists '
+                                       f'(ID: {existingSensor.id}) for device {sensorToUpdate.deviceId}')
+
+    return Crud.update_sensor(db=db, sensorId=sensorId, sensor=sensor)
+
+
 @router.delete('/{sensorId}', response_model=Status,
                summary='Deletes a specific sensor',
                description='All corresponding measurements will be deleted too.',
