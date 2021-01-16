@@ -9,7 +9,8 @@ from Settings import SETTINGS
 from logic import Constants
 from logic.databaseNew import Models, Schemas
 from logic.databaseNew.Database import engine
-from routers import DeviceRouter, SensorRouter, MeasurementRouter
+from logic.routers import DeviceRouter
+from logic.routers import SensorRouter, MeasurementRouter
 
 LOGGER = DefaultLogger().create_logger_if_not_exists(Constants.APP_NAME)
 
@@ -30,6 +31,12 @@ app = FastAPI(title=Constants.APP_NAME,
 @app.get('/', include_in_schema=False)
 async def root():
     return RedirectResponse(url='/docs')
+
+
+@app.get('/favicon.ico', include_in_schema=False)
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico',
+                               mimetype='image/vnd.microsoft.icon')
 
 
 @app.get('/version',
