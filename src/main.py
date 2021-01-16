@@ -23,20 +23,23 @@ app = FastAPI(title=Constants.APP_NAME,
               version=VERSION['name'],
               description='The StorageLeaf API',
               servers=[{'url': SETTINGS['api']['url'], 'description': f'{Constants.APP_NAME} API'}])
-app.include_router(DeviceRouter.router)
-app.include_router(SensorRouter.router)
-app.include_router(MeasurementRouter.router)
 
 
-@app.get('/')
+@app.get('/', include_in_schema=False)
 async def root():
     return RedirectResponse(url='/docs')
 
 
-@app.get('/version')
+@app.get('/version',
+         summary='Gets information about the server version',
+         tags=['general'])
 async def version():
     return JSONResponse(content=VERSION)
 
+
+app.include_router(DeviceRouter.router)
+app.include_router(SensorRouter.router)
+app.include_router(MeasurementRouter.router)
 
 if __name__ == '__main__':
     serverSettings = SETTINGS['server']
@@ -56,5 +59,3 @@ if __name__ == '__main__':
                     ssl_certfile=serverSettings['certfile'])
     else:
         uvicorn.run(app, host=serverSettings['listen'], port=serverSettings['port'])
-
-
