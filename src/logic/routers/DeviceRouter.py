@@ -34,20 +34,26 @@ async def read_device(deviceId: int, db: Session = Depends(get_database)):
              responses={400: {'description': 'Device with this name already exists'}},
              dependencies=[Depends(check_api_key)])
 async def create_device(device: Schemas.DeviceCreate, db: Session = Depends(get_database)):
-    createdDevice = Crud.get_device_by_name(db, device.name)
-    if createdDevice:
+    existingDevice = Crud.get_device_by_name(db, device.name)
+    if existingDevice:
         raise HTTPException(status_code=400, detail='Device with this name already exists')
     return Crud.create_device(db=db, device=device)
 
 
 @router.put('/{deviceId}', response_model=Schemas.Device,
-            summary='Updates a  device',
-            responses={404: {'description': 'Device not found'}},
+            summary='Updates a device',
+            responses={400: {'description': 'Device with this name already exists'},
+                       404: {'description': 'Device not found'}},
             dependencies=[Depends(check_api_key)])
 async def update_device(deviceId: int, device: Schemas.DeviceCreate, db: Session = Depends(get_database)):
-    createdDevice = Crud.get_device_by_name(db, device.name)
-    if createdDevice:
+    existingDevice = Crud.get_device(db, deviceId)
+    if not existingDevice:
         raise HTTPException(status_code=404, detail='Device not found')
+
+    existingDevice = Crud.get_device_by_name(db, device.name)
+    if existingDevice:
+        raise HTTPException(status_code=400, detail='Device with this name already exists')
+
     return Crud.update_device(db=db, deviceId=deviceId, device=device)
 
 
