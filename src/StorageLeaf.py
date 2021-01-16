@@ -3,7 +3,7 @@ import json
 import uvicorn
 from TheCodeLabs_BaseUtils.DefaultLogger import DefaultLogger
 from fastapi import FastAPI
-from starlette.responses import RedirectResponse, JSONResponse
+from starlette.responses import RedirectResponse
 
 from Settings import SETTINGS
 from logic import Constants
@@ -13,11 +13,13 @@ from routers import DeviceRouter, SensorRouter, MeasurementRouter
 
 LOGGER = DefaultLogger().create_logger_if_not_exists(Constants.APP_NAME)
 
-# create database tables
-Models.Base.metadata.create_all(bind=engine)
+databaseSettings = SETTINGS['database']
 
 with open('version.json', 'r', encoding='UTF-8') as f:
     VERSION = json.load(f)['version']
+
+# create database tables
+Models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title=Constants.APP_NAME,
               version=VERSION['name'],

@@ -3,9 +3,25 @@ from datetime import datetime
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
+from Settings import SETTINGS
+from logic.BackupService import BackupService
 from logic.databaseNew import Models, Schemas
 
 DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
+
+BACKUP_SERVICE = BackupService(SETTINGS['database']['databasePath'], **SETTINGS['database']['backup'])
+
+
+def notify_backup_service(backupService: BackupService):
+    def inner(func):
+        def wrapper(*args, **kwargs):
+            returnValue = func(*args, **kwargs)
+            backupService.perform_modification()
+            return returnValue
+
+        return wrapper
+
+    return inner
 
 
 # ===== devices =====
@@ -23,6 +39,7 @@ def get_device_by_name(db: Session, name: str):
     return db.query(Models.Device).filter(Models.Device.name == name).first()
 
 
+@notify_backup_service(BACKUP_SERVICE)
 def create_device(db: Session, device: Schemas.DeviceCreate):
     dbDevice = Models.Device(name=device.name)
     db.add(dbDevice)
@@ -31,6 +48,7 @@ def create_device(db: Session, device: Schemas.DeviceCreate):
     return dbDevice
 
 
+@notify_backup_service(BACKUP_SERVICE)
 def delete_device(db: Session, device: Schemas.Device):
     db.delete(device)
     db.commit()
@@ -51,6 +69,7 @@ def get_sensor_by_name_and_device_id(db: Session, sensorName: str, deviceId: int
         Models.Sensor.name == sensorName and Models.Sensor.deviceId == deviceId).first()
 
 
+@notify_backup_service(BACKUP_SERVICE)
 def create_sensor(db: Session, sensor: Schemas.SensorCreate):
     dbSensor = Models.Sensor(**sensor.dict())
     db.add(dbSensor)
@@ -59,6 +78,7 @@ def create_sensor(db: Session, sensor: Schemas.SensorCreate):
     return dbSensor
 
 
+@notify_backup_service(BACKUP_SERVICE)
 def delete_sensor(db: Session, sensor: Schemas.Sensor):
     db.delete(sensor)
     db.commit()
@@ -94,6 +114,7 @@ def get_measurement(db: Session, measurementId: int):
     return db.query(Models.Measurement).filter(Models.Measurement.id == measurementId).first()
 
 
+@notify_backup_service(BACKUP_SERVICE)
 def create_measurement(db: Session, measurement: Schemas.MeasurementCreate):
     dbMeasurement = Models.Measurement(**measurement.dict(), timestamp=__get_current_datetime())
     db.add(dbMeasurement)
@@ -102,6 +123,7 @@ def create_measurement(db: Session, measurement: Schemas.MeasurementCreate):
     return dbMeasurement
 
 
+@notify_backup_service(BACKUP_SERVICE)
 def delete_measurement(db: Session, measurement: Schemas.Measurement):
     db.delete(measurement)
     db.commit()
