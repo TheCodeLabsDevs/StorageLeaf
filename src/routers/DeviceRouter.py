@@ -3,7 +3,7 @@ from typing import List
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 
-from Dependencies import get_database
+from Dependencies import get_database, check_api_key
 from logic.databaseNew import Schemas, Crud
 from logic.databaseNew.Schemas import Status
 
@@ -32,8 +32,9 @@ async def read_device(deviceId: int, db: Session = Depends(get_database)):
 
 @router.post('/', response_model=Schemas.Device,
              summary='Adds a new device',
-             responses={400: {'description': 'Device with this name already exists'}})
-async def create_user(device: Schemas.DeviceCreate, db: Session = Depends(get_database)):
+             responses={400: {'description': 'Device with this name already exists'}},
+             dependencies=[Depends(check_api_key)])
+async def create_device(device: Schemas.DeviceCreate, db: Session = Depends(get_database)):
     createdDevice = Crud.get_device_by_name(db, device.name)
     if createdDevice:
         raise HTTPException(status_code=400, detail='Device with this name already exists')
@@ -42,8 +43,9 @@ async def create_user(device: Schemas.DeviceCreate, db: Session = Depends(get_da
 
 @router.delete('/{deviceId}', response_model=Status,
                summary='Gets a specific device',
-               responses={404: {'description': 'Device not found'}})
-async def read_device(deviceId: int, db: Session = Depends(get_database)):
+               responses={404: {'description': 'Device not found'}},
+               dependencies=[Depends(check_api_key)])
+async def delete_device(deviceId: int, db: Session = Depends(get_database)):
     device = Crud.get_device(db, deviceId=deviceId)
     if device is None:
         raise HTTPException(status_code=404, detail='Device not found')
