@@ -12,14 +12,6 @@ from logic.database.Database import Database
 def construct_blueprint(settings: Dict, backupService: BackupService):
     measurements = Blueprint('measurements', __name__)
 
-    @measurements.route('/measurements', methods=['GET'])
-    def get_all_measurements():
-        startDateTime = request.args.get('startDateTime')
-        endDateTime = request.args.get('endDateTime')
-
-        database = Database(settings['database']['databasePath'], backupService)
-        return jsonify(database.measurementAccess.get_all_measurements(startDateTime, endDateTime))
-
     @measurements.route('/measurements/minMax', methods=['GET'])
     def get_min_and_max_for_sensor_ids():
         if 'sensorIds' not in request.args:
@@ -56,11 +48,6 @@ def construct_blueprint(settings: Dict, backupService: BackupService):
             'min': None,
             'max': None
         })
-
-    @measurements.route('/measurement/<int:measurementID>', methods=['GET'])
-    def get_measurement(measurementID):
-        database = Database(settings['database']['databasePath'], backupService)
-        return jsonify(database.measurementAccess.get_measurement(measurementID))
 
     @measurements.route('/measurements', methods=['POST'])
     @require_api_key(password=settings['api']['key'])
@@ -114,16 +101,6 @@ def construct_blueprint(settings: Dict, backupService: BackupService):
         except ValidationError as e:
             return e.response, 400
 
-        return jsonify({'success': True})
-
-    @measurements.route('/measurement/<int:measurementID>', methods=['DELETE'])
-    @require_api_key(password=settings['api']['key'])
-    def delete_measurement(measurementID):
-        database = Database(settings['database']['databasePath'], backupService)
-        if not database.measurementAccess.get_measurement(measurementID):
-            return jsonify({'success': False, 'msg': f'No measurement with id "{measurementID}" existing'})
-
-        database.measurementAccess.delete_measurement(measurementID)
         return jsonify({'success': True})
 
     return measurements
