@@ -7,7 +7,7 @@ from logic.database.Database import Base
 class Device(Base):
     __tablename__ = 'device'
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     name = Column(String, unique=True, index=True, nullable=False)
 
     sensors = relationship('Sensor', back_populates='device', cascade='all,delete')
@@ -16,7 +16,7 @@ class Device(Base):
 class Sensor(Base):
     __tablename__ = 'sensor'
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     name = Column(String, index=True, nullable=False)
     type = Column(String, index=True, nullable=False)
     deviceId = Column(Integer, ForeignKey('device.id'))
@@ -28,7 +28,7 @@ class Sensor(Base):
 class Measurement(Base):
     __tablename__ = 'measurement'
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     timestamp = Column(String, index=True, nullable=False)
     value = Column(String, index=True, nullable=False)
     sensorId = Column(Integer, ForeignKey('sensor.id'))
