@@ -3,8 +3,25 @@ from typing import List
 from pydantic import BaseModel
 
 
+# ===== special =====
+
 class Status(BaseModel):
     message: str
+
+
+class Version(BaseModel):
+    name: str
+    code: int
+    date: str
+
+    class Config:
+        schema_extra = {
+            'example': {
+                'name': 'v1.0.0',
+                'code': 1,
+                'date': '28.12.20',
+            }
+        }
 
 
 class MinMax(BaseModel):

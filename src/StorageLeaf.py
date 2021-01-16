@@ -7,7 +7,7 @@ from starlette.responses import RedirectResponse, JSONResponse
 
 from Settings import SETTINGS
 from logic import Constants
-from logic.databaseNew import Models
+from logic.databaseNew import Models, Schemas
 from logic.databaseNew.Database import engine
 from routers import DeviceRouter, SensorRouter, MeasurementRouter
 
@@ -32,9 +32,10 @@ async def root():
 
 @app.get('/version',
          summary='Gets information about the server version',
-         tags=['general'])
+         tags=['general'],
+         response_model=Schemas.Version)
 async def version():
-    return JSONResponse(content=VERSION)
+    return Schemas.Version(**VERSION)
 
 
 app.include_router(DeviceRouter.router)
