@@ -2,6 +2,7 @@ import json
 
 import uvicorn
 from fastapi import FastAPI
+from starlette.responses import RedirectResponse
 
 from logic import Constants
 from logic.databaseNew import Models
@@ -23,6 +24,11 @@ app = FastAPI(title=Constants.APP_NAME,
               version=version['name'],
               description='The StorageLeaf API')
 app.include_router(DeviceRouter.router)
+
+
+@app.get("/")
+async def root():
+    return RedirectResponse(url='/docs')
 
 if __name__ == '__main__':
     uvicorn.run(app, host=settings['server']['listen'], port=settings['server']['port'])
