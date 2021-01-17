@@ -8,6 +8,7 @@ from starlette.responses import RedirectResponse, FileResponse
 
 from Settings import SETTINGS
 from logic import Constants
+from logic.DiscoveryService import DiscoveryService
 from logic.database import Models, Schemas
 from logic.database.Database import engine
 from logic.routers import DeviceRouter
@@ -50,6 +51,11 @@ async def version():
 app.include_router(DeviceRouter.router)
 app.include_router(SensorRouter.router)
 app.include_router(MeasurementRouter.router)
+
+discoverySettings = SETTINGS['discovery']
+discoverySettings['apiPort'] = SETTINGS['server']['port']
+discoveryService = DiscoveryService(**discoverySettings)
+discoveryService.start()
 
 if __name__ == '__main__':
     serverSettings = SETTINGS['server']

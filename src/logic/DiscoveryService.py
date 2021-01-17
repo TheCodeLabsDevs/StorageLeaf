@@ -18,7 +18,7 @@ class DiscoveryService:
         self._shouldStop = False
 
     def start(self):
-        LOGGER.debug("Start discovery thread")
+        LOGGER.debug(f'Start discovery thread (listening on {self._discoveryPort}, responding on {self._responsePort})')
 
         x = threading.Thread(target=self.__loop)
         x.start()
