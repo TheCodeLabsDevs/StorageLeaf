@@ -88,7 +88,7 @@ async def create_multiple_measurements(measurementsToAdd: Schemas.MultipleMeasur
         if not existingSensor:
             existingSensor = Crud.create_sensor(db, Schemas.SensorCreate(name=sensor.name,
                                                                          type=sensor.type,
-                                                                         devideId=existingDevice.id))
-        Crud.create_measurement(db, Schemas.MeasurementCreate(value=sensor.value, sensorId=existingSensor.id))
+                                                                         device_id=existingDevice.id))
+        Crud.create_measurement(db, Schemas.MeasurementCreate(value=sensor.value, sensor_id=existingSensor.id))
 
     return Status(message=f'Success')
