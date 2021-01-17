@@ -25,8 +25,8 @@ class Version(BaseModel):
 
 
 class MinMax(BaseModel):
-    min: float or None
-    max: float or None
+    min: float = None
+    max: float = None
 
 
 # ===== measurement =====

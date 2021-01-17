@@ -70,7 +70,7 @@ async def get_min_and_max_for_sensor_ids(sensorIds: List[int] = Query(None),
     if values:
         return MinMax(min=min(values), max=max(values))
 
-    return MinMax(min=None, max=None)
+    return MinMax()
 
 
 @router.post('/measurements/', response_model=Schemas.Status,

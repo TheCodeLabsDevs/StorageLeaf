@@ -117,11 +117,17 @@ def get_measurements(db: Session, startDateTime: str, endDateTime: str) -> List[
 def get_measurements_for_sensor(db: Session, startDateTime: str,
                                 endDateTime: str, sensorId: int) -> List[Models.Measurement]:
     if startDateTime and endDateTime:
-        return db.query(Models.Measurement).filter(and_(startDateTime <= Models.Measurement.timestamp,
-                                                        endDateTime >= Models.Measurement.timestamp,
-                                                        Models.Measurement.sensor_id == sensorId)).all()
+        return db.query(Models.Measurement) \
+            .filter(and_(startDateTime <= Models.Measurement.timestamp,
+                         endDateTime >= Models.Measurement.timestamp,
+                         Models.Measurement.sensor_id == sensorId)) \
+            .order_by(Models.Measurement.timestamp.desc()) \
+            .all()
 
-    return db.query(Models.Measurement).filter(Models.Measurement.sensor_id == sensorId).all()
+    return db.query(Models.Measurement) \
+        .filter(Models.Measurement.sensor_id == sensorId) \
+        .order_by(Models.Measurement.timestamp.desc()) \
+        .all()
 
 
 def get_latest_measurement_for_sensor(db: Session, sensorId: int) -> Models.Measurement:
