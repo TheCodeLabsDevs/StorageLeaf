@@ -53,7 +53,7 @@ async def create_sensor(sensor: Schemas.SensorCreate, db: Session = Depends(get_
             summary='Updates a sensor',
             responses={404: {'description': 'Sensor not found'}},
             dependencies=[Depends(check_api_key)])
-async def update_device(sensorId: int, sensor: Schemas.SensorUpdate, db: Session = Depends(get_database)):
+async def update_sensor(sensorId: int, sensor: Schemas.SensorUpdate, db: Session = Depends(get_database)):
     sensorToUpdate = Crud.get_sensor(db, sensorId)
     if not sensorToUpdate:
         raise HTTPException(status_code=404, detail='Sensor not found')

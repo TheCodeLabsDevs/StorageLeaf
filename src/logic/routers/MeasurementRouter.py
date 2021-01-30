@@ -41,6 +41,18 @@ async def create_measurement(measurement: Schemas.MeasurementCreate, db: Session
     return Crud.create_measurement(db=db, measurement=measurement)
 
 
+@router.put('/measurement/{measurementId}', response_model=Schemas.Measurement,
+            summary='Update a specific measurement',
+            responses={404: {'description': 'Measurement not found'}},
+            dependencies=[Depends(check_api_key)])
+async def update_measurement(measurementId: int, measurement: Schemas.MeasurementUpdate, db: Session = Depends(get_database)):
+    existingMeasurement = Crud.get_measurement(db, measurementId)
+    if existingMeasurement is None:
+        raise HTTPException(status_code=404, detail='Measurement not found')
+
+    return Crud.update_measurement(db, measurementId=measurementId, measurement=measurement)
+
+
 @router.delete('/measurement/{measurementId}', response_model=Status,
                summary='Deletes a specific measurementId',
                responses={404: {'description': 'Measurement not found'}},

@@ -151,6 +151,15 @@ def create_measurement(db: Session, measurement: Schemas.MeasurementCreate) -> M
 
 
 @notify_backup_service(BACKUP_SERVICE)
+def update_measurement(db: Session, measurementId: int, measurement: Schemas.MeasurementUpdate) -> Models.Measurement:
+    existingMeasurement = get_measurement(db, measurementId)
+    existingMeasurement.value = measurement.value
+    db.commit()
+    db.refresh(existingMeasurement)
+    return existingMeasurement
+
+
+@notify_backup_service(BACKUP_SERVICE)
 def delete_measurement(db: Session, measurement: Schemas.Measurement):
     db.delete(measurement)
     db.commit()

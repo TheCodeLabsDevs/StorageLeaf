@@ -45,6 +45,10 @@ class MeasurementCreate(BaseModel):
     sensor_id: int
 
 
+class MeasurementUpdate(BaseModel):
+    value: str = Field(..., min_length=1)
+
+
 # ===== sensor =====
 class SensorBase(BaseModel):
     id: int
