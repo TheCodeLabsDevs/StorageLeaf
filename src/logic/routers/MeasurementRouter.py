@@ -42,7 +42,7 @@ async def create_measurement(measurement: Schemas.MeasurementCreate, db: Session
 
 
 @router.put('/measurement/{measurementId}', response_model=Schemas.Measurement,
-            summary='Update a specific measurement',
+            summary='Updates a specific measurement',
             responses={404: {'description': 'Measurement not found'}},
             dependencies=[Depends(check_api_key)])
 async def update_measurement(measurementId: int, measurement: Schemas.MeasurementUpdate, db: Session = Depends(get_database)):

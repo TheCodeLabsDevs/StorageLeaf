@@ -7,7 +7,7 @@ An interactive OpenAPI Swagger documentation can be accessed by opening the serv
 - temperature
 - humidity
 
----
+
 ## Credits
 
 ### Icons
@@ -17,13 +17,3 @@ An interactive OpenAPI Swagger documentation can be accessed by opening the serv
 ### Python libraries
 See `Pipfile` and `Pipfile.lock`
 (This project uses some personal libraries not available on the official pypi. The source code can be found here [https://thecodelabs.de/TheCodeLabs/PythonLibs](https://thecodelabs.de/TheCodeLabs/PythonLibs))
-
----
-
-## Installation on Raspberry Pi Zero
-Pipenv can cause some problems. Possible solution:
-- use pipenv 2018-11-26
-- run `pipenv lock`
-- open `Pipfile.lock` and remove the `gevent` dependency
-- run `Pipenv sync`
-- install gevent manually via `pipenv install gevent`
