@@ -15,7 +15,7 @@ An interactive OpenAPI Swagger documentation can be accessed by opening the serv
 - database solid icon - made by Pixel perfect from [https://www.flaticon.com/](https://www.flaticon.com/)]
 
 ### Python libraries
-See `Pipfile.lock`  
+See `Pipfile` and `Pipfile.lock`
 (This project uses some personal libraries not available on the official pypi. The source code can be found here [https://thecodelabs.de/TheCodeLabs/PythonLibs](https://thecodelabs.de/TheCodeLabs/PythonLibs))
 
 ---
