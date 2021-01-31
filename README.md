@@ -7,8 +7,21 @@ An interactive OpenAPI Swagger documentation can be accessed by opening the serv
 - temperature
 - humidity
 
+---
+## Credits
+
+### Icons
+- leaf icon - made by Freepik from [https://www.flaticon.com/](https://www.flaticon.com/)]
+- database solid icon - made by Pixel perfect from [https://www.flaticon.com/](https://www.flaticon.com/)]
+
+### Python libraries
+See `Pipfile.lock`  
+(This project uses some personal libraries not available on the official pypi. The source code can be found here [https://thecodelabs.de/TheCodeLabs/PythonLibs](https://thecodelabs.de/TheCodeLabs/PythonLibs))
+
+---
+
 ## Installation on Raspberry Pi Zero
-- pipenv is causing some problems
+Pipenv can cause some problems. Possible solution:
 - use pipenv 2018-11-26
 - run `pipenv lock`
 - open `Pipfile.lock` and remove the `gevent` dependency
