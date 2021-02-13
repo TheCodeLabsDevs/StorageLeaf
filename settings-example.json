@@ -5,7 +5,10 @@
         "secret": "",
         "useSSL": false,
         "keyfile": "",
-        "certfile": ""
+        "certfile": "",
+        "cors_origins": [
+            "http://localhost:8080"
+        ]
     },
     "database": {
         "databasePath": "storageLeaf.db",

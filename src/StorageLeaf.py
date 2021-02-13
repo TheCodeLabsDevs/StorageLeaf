@@ -4,6 +4,7 @@ import os
 import uvicorn
 from TheCodeLabs_BaseUtils.DefaultLogger import DefaultLogger
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import RedirectResponse, FileResponse
 
 from Settings import SETTINGS
@@ -28,6 +29,15 @@ app = FastAPI(title=Constants.APP_NAME,
               version=VERSION['name'],
               description='The StorageLeaf API',
               servers=[{'url': SETTINGS['api']['url'], 'description': f'{Constants.APP_NAME} API'}])
+
+if 'cors_origins' in SETTINGS['server']:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=SETTINGS['server']['cors_origins'],
+        allow_credentials=True,
+        allow_methods=['*'],
+        allow_headers=['*'],
+    )
 
 
 @app.get('/', include_in_schema=False)
