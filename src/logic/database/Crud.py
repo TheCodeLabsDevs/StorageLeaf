@@ -143,7 +143,10 @@ def get_measurement(db: Session, measurementId: int) -> Models.Measurement:
 
 @notify_backup_service(BACKUP_SERVICE)
 def create_measurement(db: Session, measurement: Schemas.MeasurementCreate) -> Models.Measurement:
-    dbMeasurement = Models.Measurement(**measurement.dict(), timestamp=__get_current_datetime())
+    if measurement.timestamp is None:
+        measurement.timestamp = __get_current_datetime()
+
+    dbMeasurement = Models.Measurement(**measurement.dict())
     db.add(dbMeasurement)
     db.commit()
     db.refresh(dbMeasurement)

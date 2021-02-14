@@ -1,6 +1,7 @@
 from typing import List
 
 from pydantic import BaseModel, Field
+from typing import Optional
 
 
 # ===== special =====
@@ -42,6 +43,7 @@ class Measurement(BaseModel):
 
 class MeasurementCreate(BaseModel):
     value: str = Field(..., min_length=1)
+    timestamp: Optional[str]
     sensor_id: int
 
 
