@@ -4,6 +4,7 @@ import os
 import uvicorn
 from TheCodeLabs_BaseUtils.DefaultLogger import DefaultLogger
 from fastapi import FastAPI
+from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import RedirectResponse, FileResponse
 
@@ -27,8 +28,9 @@ Models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title=Constants.APP_NAME,
               version=VERSION['name'],
-              description='The StorageLeaf API',
-              servers=[{'url': SETTINGS['api']['url'], 'description': f'{Constants.APP_NAME} API'}])
+              servers=[{'url': SETTINGS['api']['url'], 'description': f'{Constants.APP_NAME} API'}],
+              docs_url=None,
+              redoc_url=None)
 
 if 'cors_origins' in SETTINGS['server']:
     app.add_middleware(
@@ -56,6 +58,18 @@ def favicon():
          response_model=Schemas.Version)
 async def version():
     return Schemas.Version(**VERSION)
+
+
+@app.get('/docs', include_in_schema=False)
+def overridden_swagger():
+    return get_swagger_ui_html(openapi_url='/openapi.json', title='The StorageLeaf API',
+                               swagger_favicon_url=app.url_path_for('favicon'))
+
+
+@app.get('/redoc', include_in_schema=False)
+def overridden_redoc():
+    return get_redoc_html(openapi_url='/openapi.json', title='The StorageLeaf API',
+                          redoc_favicon_url=app.url_path_for('favicon'))
 
 
 app.include_router(DeviceRouter.router)
