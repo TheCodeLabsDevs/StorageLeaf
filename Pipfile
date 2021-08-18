@@ -13,8 +13,8 @@ python_version = "3"
 
 [packages]
 TheCodeLabs-BaseUtils = "*"
-fastapi = "==0.65.1"
-uvicorn = "==0.13.4"
-sqlalchemy = "==1.4.15"
+fastapi = "==0.68.0"
+uvicorn = "==0.15.0"
+sqlalchemy = "==1.4.22"
 
 [dev-packages]
