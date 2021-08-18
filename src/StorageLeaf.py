@@ -3,27 +3,23 @@ import os
 
 import uvicorn
 from TheCodeLabs_BaseUtils.DefaultLogger import DefaultLogger
-from fastapi import FastAPI, Depends
-from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
+from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
 from starlette.responses import RedirectResponse, FileResponse
 
-from Settings import SETTINGS
+from Settings import SETTINGS, VERSION
 from logic import Constants
-from logic.Dependencies import get_database
 from logic.DiscoveryService import DiscoveryService
-from logic.database import Models, Schemas, Crud
+from logic.database import Models
 from logic.database.Database import engine
-from logic.routers import DeviceRouter
+from logic.routers import DeviceRouter, GeneralRouter
 from logic.routers import SensorRouter, MeasurementRouter
 
 LOGGER = DefaultLogger().create_logger_if_not_exists(Constants.APP_NAME)
 
-databaseSettings = SETTINGS['database']
+DATABASE_SETTINGS = SETTINGS['database']
 
-with open('version.json', 'r', encoding='UTF-8') as f:
-    VERSION = json.load(f)['version']
 
 # create database tables
 Models.Base.metadata.create_all(bind=engine)
@@ -54,14 +50,6 @@ def favicon():
     return FileResponse(os.path.join(app.root_path, 'static', 'favicon.ico'), media_type='image/vnd.microsoft.icon')
 
 
-@app.get('/version',
-         summary='Gets information about the server version',
-         tags=['general'],
-         response_model=Schemas.Version)
-async def version():
-    return Schemas.Version(**VERSION)
-
-
 @app.get('/docs', include_in_schema=False)
 def overridden_swagger():
     return get_swagger_ui_html(openapi_url='/openapi.json', title='The StorageLeaf API',
@@ -74,20 +62,7 @@ def overridden_redoc():
                           redoc_favicon_url=app.url_path_for('favicon'))
 
 
-@app.get('/databaseInfo',
-         summary='Gets information about the database version',
-         tags=['general'],
-         response_model=Schemas.DatabaseInfo)
-async def databaseInfo(db: Session = Depends(get_database)):
-    numberOfMeasurements = Crud.get_total_number_of_measurements(db)
-
-    sizeInBytes = os.path.getsize(databaseSettings['databasePath'])
-    sizeInMegaBytes = sizeInBytes // 1024 // 1024
-
-    return Schemas.DatabaseInfo(number_of_measurements=numberOfMeasurements,
-                                size_on_disk_in_mb=sizeInMegaBytes)
-
-
+app.include_router(GeneralRouter.router)
 app.include_router(DeviceRouter.router)
 app.include_router(SensorRouter.router)
 app.include_router(MeasurementRouter.router)
