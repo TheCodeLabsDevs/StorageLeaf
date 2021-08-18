@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from Settings import VERSION
+from Settings import VERSION, SETTINGS
 from logic.Dependencies import get_database
 from logic.database import Schemas, DatabaseInfoProvider
+from logic.database.DatabaseCleaner import DatabaseCleaner, RetentionPolicy
 
 router = APIRouter(
     prefix='/general',
@@ -31,7 +32,12 @@ async def databaseInfo(db: Session = Depends(get_database)):
 async def databaseCleanup(db: Session = Depends(get_database)):
     infoBefore = DatabaseInfoProvider.get_database_info(db)
 
-    # TODO
+    retentionPolicies = SETTINGS['database']['retentionPolicies']
+    policies = []
+    for item in retentionPolicies:
+        policies.append(RetentionPolicy(resolutionInMinutes=item['resolutionInMinutes'], ageInDays=item['ageInDays']))
+
+    DatabaseCleaner(policies).clean(db)
 
     infoAfter = DatabaseInfoProvider.get_database_info(db)
 

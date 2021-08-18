@@ -20,7 +20,17 @@
             "owncloudUser": "myUser",
             "owncloudPassword": "",
             "owncloudDestinationPath": "MyFolder"
-        }
+        },
+        "retentionPolicies": [
+            {
+                "resolutionInMinutes": 60,
+                "ageInDays": 30
+            },
+            {
+                "resolutionInMinutes": 3600,
+                "ageInDays": 60
+            }
+        ]
     },
     "api": {
         "url": "http://localhost:10003",
