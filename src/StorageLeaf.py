@@ -3,15 +3,17 @@ import os
 
 import uvicorn
 from TheCodeLabs_BaseUtils.DefaultLogger import DefaultLogger
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import Session
 from starlette.responses import RedirectResponse, FileResponse
 
 from Settings import SETTINGS
 from logic import Constants
+from logic.Dependencies import get_database
 from logic.DiscoveryService import DiscoveryService
-from logic.database import Models, Schemas
+from logic.database import Models, Schemas, Crud
 from logic.database.Database import engine
 from logic.routers import DeviceRouter
 from logic.routers import SensorRouter, MeasurementRouter
@@ -70,6 +72,20 @@ def overridden_swagger():
 def overridden_redoc():
     return get_redoc_html(openapi_url='/openapi.json', title='The StorageLeaf API',
                           redoc_favicon_url=app.url_path_for('favicon'))
+
+
+@app.get('/databaseInfo',
+         summary='Gets information about the database version',
+         tags=['general'],
+         response_model=Schemas.DatabaseInfo)
+async def databaseInfo(db: Session = Depends(get_database)):
+    numberOfMeasurements = Crud.get_total_number_of_measurements(db)
+
+    sizeInBytes = os.path.getsize(databaseSettings['databasePath'])
+    sizeInMegaBytes = sizeInBytes // 1024 // 1024
+
+    return Schemas.DatabaseInfo(number_of_measurements=numberOfMeasurements,
+                                size_on_disk_in_mb=sizeInMegaBytes)
 
 
 app.include_router(DeviceRouter.router)

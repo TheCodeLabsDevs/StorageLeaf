@@ -25,6 +25,19 @@ class Version(BaseModel):
         }
 
 
+class DatabaseInfo(BaseModel):
+    number_of_measurements: int
+    size_on_disk_in_mb: int
+
+    class Config:
+        schema_extra = {
+            'example': {
+                'number_of_measurements': 1000,
+                'size_on_disk_in_mb': 14
+            }
+        }
+
+
 class MinMax(BaseModel):
     min: float = None
     max: float = None

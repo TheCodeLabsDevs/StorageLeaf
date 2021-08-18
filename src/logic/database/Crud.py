@@ -168,5 +168,9 @@ def delete_measurement(db: Session, measurement: Schemas.Measurement):
     db.commit()
 
 
+def get_total_number_of_measurements(db: Session) -> List[int]:
+    return db.query(Models.Measurement).count()
+
+
 def __get_current_datetime():
     return datetime.strftime(datetime.now(), DATE_FORMAT)
