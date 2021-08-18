@@ -38,6 +38,12 @@ class DatabaseInfo(BaseModel):
         }
 
 
+class DatabaseCleanupInfo(BaseModel):
+    before: DatabaseInfo
+    after: DatabaseInfo
+    difference: DatabaseInfo
+
+
 class MinMax(BaseModel):
     min: float = None
     max: float = None

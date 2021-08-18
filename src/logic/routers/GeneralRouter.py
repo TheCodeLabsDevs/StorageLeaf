@@ -23,3 +23,21 @@ async def version():
             response_model=Schemas.DatabaseInfo)
 async def databaseInfo(db: Session = Depends(get_database)):
     return DatabaseInfoProvider.get_database_info(db)
+
+
+@router.get('/databaseCleanup',
+            summary='Cleans up the database by enforcing the configured retention policies',
+            response_model=Schemas.DatabaseCleanupInfo)
+async def databaseCleanup(db: Session = Depends(get_database)):
+    infoBefore = DatabaseInfoProvider.get_database_info(db)
+
+    # TODO
+
+    infoAfter = DatabaseInfoProvider.get_database_info(db)
+
+    deletedMeasurements = infoBefore.number_of_measurements - infoAfter.number_of_measurements
+    sizeFreed = infoBefore.size_on_disk_in_mb - infoAfter.size_on_disk_in_mb
+    infoDifference = Schemas.DatabaseInfo(number_of_measurements=deletedMeasurements, size_on_disk_in_mb=sizeFreed)
+
+    return Schemas.DatabaseCleanupInfo(before=infoBefore,  after=infoAfter,  difference=infoDifference)
+
