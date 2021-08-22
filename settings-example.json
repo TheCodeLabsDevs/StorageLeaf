@@ -21,16 +21,19 @@
             "owncloudPassword": "",
             "owncloudDestinationPath": "MyFolder"
         },
-        "retentionPolicies": [
-            {
-                "numberOfMeasurementsPerDay": 24,
-                "ageInDays": 30
-            },
-            {
-                "numberOfMeasurementsPerDay": 2,
-                "ageInDays": 60
-            }
-        ]
+        "cleanup": {
+            "forceBackupAfterCleanup": true,
+            "retentionPolicies": [
+                {
+                    "numberOfMeasurementsPerDay": 24,
+                    "ageInDays": 30
+                },
+                {
+                    "numberOfMeasurementsPerDay": 2,
+                    "ageInDays": 60
+                }
+            ]
+        }
     },
     "api": {
         "url": "http://localhost:10003",

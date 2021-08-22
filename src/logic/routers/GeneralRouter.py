@@ -29,13 +29,13 @@ async def databaseInfo(db: Session = Depends(get_database)):
 
 
 @router.get('/databaseCleanup',
-            summary='Cleans up the database by enforcing the configured retention policies',
+            summary='Cleans up the database by enforcing the configured retention policies for each sensor',
             response_model=Schemas.DatabaseCleanupInfo,
             dependencies=[Depends(check_api_key)])
 async def databaseCleanup(db: Session = Depends(get_database)):
     infoBefore = DatabaseInfoProvider.get_database_info(db)
 
-    retentionPolicies = SETTINGS['database']['retentionPolicies']
+    retentionPolicies = SETTINGS['database']['cleanup']['retentionPolicies']
     policies = []
     for item in retentionPolicies:
         policies.append(RetentionPolicy(numberOfMeasurementsPerDay=item['numberOfMeasurementsPerDay'],
