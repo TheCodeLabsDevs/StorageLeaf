@@ -220,7 +220,7 @@ class TestDatabaseCleaner(unittest.TestCase):
 
             database = Mock()
             from logic.database.DatabaseCleaner import DatabaseCleaner
-            DatabaseCleaner([]).clean(database, CURRENT_DATE_TIME)
+            DatabaseCleaner([], False).clean(database, CURRENT_DATE_TIME)
 
             mockedCrud.get_measurements_for_sensor.assert_not_called()
 
@@ -238,7 +238,7 @@ class TestDatabaseCleaner(unittest.TestCase):
             from logic.database.DatabaseCleaner import RetentionPolicy
 
             policy = RetentionPolicy(numberOfMeasurementsPerDay=4, ageInDays=1)
-            DatabaseCleaner([policy]).clean(database, datetime(year=2021, month=8, day=19).date())
+            DatabaseCleaner([policy], False).clean(database, datetime(year=2021, month=8, day=19).date())
 
             mockedCrud.delete_multiple_measurements.assert_called_once_with(database, {3})
 
@@ -261,7 +261,7 @@ class TestDatabaseCleaner(unittest.TestCase):
             from logic.database.DatabaseCleaner import RetentionPolicy
 
             policy = RetentionPolicy(numberOfMeasurementsPerDay=4, ageInDays=1)
-            DatabaseCleaner([policy]).clean(database, datetime(year=2021, month=8, day=19).date())
+            DatabaseCleaner([policy], False).clean(database, datetime(year=2021, month=8, day=19).date())
 
             calls = mockedCrud.delete_multiple_measurements.call_args_list
             self.assertEqual(2, len(calls))
@@ -284,9 +284,28 @@ class TestDatabaseCleaner(unittest.TestCase):
 
             policy1 = RetentionPolicy(numberOfMeasurementsPerDay=4, ageInDays=1)
             policy2 = RetentionPolicy(numberOfMeasurementsPerDay=2, ageInDays=1)
-            DatabaseCleaner([policy1, policy2]).clean(database, datetime(year=2021, month=8, day=19).date())
+            DatabaseCleaner([policy1, policy2], False).clean(database, datetime(year=2021, month=8, day=19).date())
 
             calls = mockedCrud.delete_multiple_measurements.call_args_list
             self.assertEqual(2, len(calls))
             self.assertEqual((database, {3}), calls[0].args)
             self.assertEqual((database, {3, 4}), calls[1].args)
+
+    def test_forceBackupAfterCleanup(self):
+        mockedCrud = Mock()
+
+        with patch.dict('sys.modules', **{'logic.database.Crud': mockedCrud}):
+            mockedCrud.DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
+            mockedCrud.get_measurements_for_sensor.return_value = []
+            mockedCrud.get_sensors.return_value = [Schemas.Sensor(id=1, name="myTempSensor",
+                                                                  type="temperature", device_id=1)]
+            mockedCrud.get_first_measurement_for_sensor.return_value = self.FIRST_MEASUREMENT
+
+            database = Mock()
+            from logic.database.DatabaseCleaner import DatabaseCleaner
+            from logic.database.DatabaseCleaner import RetentionPolicy
+
+            policy = RetentionPolicy(numberOfMeasurementsPerDay=4, ageInDays=1)
+            DatabaseCleaner([policy], True).clean(database, datetime(year=2021, month=8, day=19).date())
+
+            mockedCrud.BACKUP_SERVICE.backup.assert_called_once()

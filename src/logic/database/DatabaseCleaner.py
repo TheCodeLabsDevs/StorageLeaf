@@ -14,8 +14,9 @@ LOGGER = logging.getLogger(Constants.APP_NAME)
 class DatabaseCleaner:
     MIN_DATE = datetime(year=1970, month=1, day=1).date()
 
-    def __init__(self, retentionPolicies: List[RetentionPolicy]):
+    def __init__(self, retentionPolicies: List[RetentionPolicy], forceBackupAfterCleanup: bool):
         self._policies = retentionPolicies
+        self._forceBackupAfterCleanup = forceBackupAfterCleanup
 
     def clean(self, db: Session, currentDate: datetime.date):
         LOGGER.info('Performing database cleanup...')
@@ -33,7 +34,8 @@ class DatabaseCleaner:
 
         LOGGER.info('Database cleanup done')
 
-        # TODO: force backup?
+        if self._forceBackupAfterCleanup:
+            Crud.BACKUP_SERVICE.backup()
 
     @staticmethod
     def _cleanup_measurements_for_sensor(sensor: Schemas.Sensor, db: Session,
