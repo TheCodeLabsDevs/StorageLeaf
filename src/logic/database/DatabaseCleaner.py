@@ -29,35 +29,41 @@ class DatabaseCleaner:
             for sensor in allSensors:
                 LOGGER.debug(f'Cleaning measurements for sensor "{sensor.name}" '
                              f'(id: {sensor.id}, device_id: {sensor.device_id})')
-
-                firstMeasurement = Crud.get_first_measurement_for_sensor(db=db, sensorId=sensor.id)
-                if firstMeasurement is None:
-                    continue
-
-                minDate = datetime.strptime(firstMeasurement.timestamp, Crud.DATE_FORMAT).date()
-
-                processedDate = policyStart
-                while processedDate > minDate:
-                    LOGGER.debug(f'Cleaning {processedDate.strftime("%Y-%m-%d")}...')
-                    measurementIds, idsToDelete = DatabaseCleaner._categorize_measurements_for_day(db,
-                                                                                                   date=processedDate,
-                                                                                                   policy=policy,
-                                                                                                   sensorId=sensor.id)
-
-                    processedDate = processedDate - timedelta(days=1)
-
-                    if not idsToDelete:
-                        continue
-
-                    LOGGER.debug(
-                        f'Scheduled {len(idsToDelete)} measurements for deletion (keeping: {len(measurementIds)}, '
-                        f'max allowed: {policy.numberOfMeasurementsPerDay})')
-
-                    Crud.delete_multiple_measurements(db, idsToDelete)
+                self._cleanup_measurements_for_sensor(sensor, db, policy, policyStart)
 
         LOGGER.info('Database cleanup done')
 
         # TODO: force backup?
+
+    @staticmethod
+    def _cleanup_measurements_for_sensor(sensor: Schemas.Sensor, db: Session,
+                                         policy: RetentionPolicy, policyStart: datetime.date):
+        firstMeasurement = Crud.get_first_measurement_for_sensor(db=db, sensorId=sensor.id)
+        if firstMeasurement is None:
+            return
+
+        minDate = datetime.strptime(firstMeasurement.timestamp, Crud.DATE_FORMAT).date()
+
+        processedDate = policyStart
+        while processedDate > minDate:
+            LOGGER.debug(f'Cleaning {processedDate.strftime("%Y-%m-%d")}...')
+            DatabaseCleaner._cleanup_measurements_for_day(db, processedDate, policy, sensor.id)
+            processedDate = processedDate - timedelta(days=1)
+
+    @staticmethod
+    def _cleanup_measurements_for_day(db: Session, date: datetime.date,
+                                      policy: RetentionPolicy, sensor_id: int):
+        measurementIds, idsToDelete = DatabaseCleaner._categorize_measurements_for_day(db,
+                                                                                       date=date,
+                                                                                       policy=policy,
+                                                                                       sensorId=sensor_id)
+
+        if not idsToDelete:
+            return
+
+        LOGGER.debug(f'Scheduled {len(idsToDelete)} measurements for deletion '
+                     f'(keeping: {len(measurementIds)}, max allowed: {policy.numberOfMeasurementsPerDay})')
+        Crud.delete_multiple_measurements(db, idsToDelete)
 
     @staticmethod
     def _categorize_measurements_for_day(db: Session, date: datetime.date,
