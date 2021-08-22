@@ -14,9 +14,6 @@ LOGGER = logging.getLogger(Constants.APP_NAME)
 class DatabaseCleaner:
     MIN_DATE = datetime(year=1970, month=1, day=1).date()
 
-    # TODO DEBUG:
-    # MIN_DATE = (datetime.now() - timedelta(days=31)).date()
-
     def __init__(self, retentionPolicies: List[RetentionPolicy]):
         self._policies = retentionPolicies
 
@@ -27,21 +24,30 @@ class DatabaseCleaner:
             LOGGER.debug(f'Enforcing retention policy: {policy}')
 
             policyStart = currentDate - timedelta(days=policy.ageInDays)
-            processedDate = policyStart
-            while processedDate > self.MIN_DATE:
-                LOGGER.debug(f'Cleaning {processedDate.strftime("%Y-%m-%d")}...')
-                measurementIds, idsToDelete = DatabaseCleaner._categorize_measurements_for_day(db, date=processedDate,
-                                                                                               policy=policy)
 
-                processedDate = processedDate - timedelta(days=1)
+            allSensors = Crud.get_sensors(db, skip=0, limit=1000000)
+            for sensor in allSensors:
+                LOGGER.debug(f'Cleaning measurements for sensor "{sensor.name}" '
+                             f'(id: {sensor.id}, device_id: {sensor.device_id})')
 
-                if not idsToDelete:
-                    continue
+                processedDate = policyStart
+                while processedDate > self.MIN_DATE:
+                    LOGGER.debug(f'Cleaning {processedDate.strftime("%Y-%m-%d")}...')
+                    measurementIds, idsToDelete = DatabaseCleaner._categorize_measurements_for_day(db,
+                                                                                                   date=processedDate,
+                                                                                                   policy=policy,
+                                                                                                   sensorId=sensor.id)
 
-                LOGGER.debug(f'Scheduled {len(idsToDelete)} measurements for deletion (keeping: {len(measurementIds)}, '
-                             f'max allowed: {policy.numberOfMeasurementsPerDay})')
+                    processedDate = processedDate - timedelta(days=1)
 
-                Crud.delete_multiple_measurements(db, idsToDelete)
+                    if not idsToDelete:
+                        continue
+
+                    LOGGER.debug(
+                        f'Scheduled {len(idsToDelete)} measurements for deletion (keeping: {len(measurementIds)}, '
+                        f'max allowed: {policy.numberOfMeasurementsPerDay})')
+
+                    Crud.delete_multiple_measurements(db, idsToDelete)
 
         LOGGER.info('Database cleanup done')
 
@@ -49,7 +55,7 @@ class DatabaseCleaner:
 
     @staticmethod
     def _categorize_measurements_for_day(db: Session, date: datetime.date,
-                                         policy: RetentionPolicy) -> Tuple[List[int], Set[int]]:
+                                         policy: RetentionPolicy, sensorId: int) -> Tuple[List[int], Set[int]]:
         points = policy.determine_measurement_points(date)
 
         measurementIdsToKeep = []
@@ -58,8 +64,9 @@ class DatabaseCleaner:
             previousItem = DatabaseCleaner.__get_previous_item(index, point, points)
             nextItem = DatabaseCleaner.__get_next_item(index, point, points)
 
-            possibleMeasurements = Crud.get_measurements(db, previousItem.strftime(Crud.DATE_FORMAT),
-                                                         nextItem.strftime(Crud.DATE_FORMAT))
+            possibleMeasurements = Crud.get_measurements_for_sensor(db, previousItem.strftime(Crud.DATE_FORMAT),
+                                                                    nextItem.strftime(Crud.DATE_FORMAT), sensorId)
+
             allMeasurementIds.update([m.id for m in possibleMeasurements])
 
             closestMeasurement = DatabaseCleaner._get_closest_measurement_for_point(possibleMeasurements, point)
