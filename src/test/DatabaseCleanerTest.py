@@ -98,6 +98,8 @@ class TestDatabaseCleaner(unittest.TestCase):
                 return [cls.MEASUREMENT2, cls.MEASUREMENT3, cls.MEASUREMENT4]
             elif startTime == '2021-08-18 18:00:00' and endTime == '2021-08-18 23:59:59':
                 return []
+            elif startTime == '2021-08-18 00:00:00' and endTime == '2021-08-18 23:59:59':
+                return [cls.MEASUREMENT1, cls.MEASUREMENT2, cls.MEASUREMENT3, cls.MEASUREMENT4]
             else:
                 return []
         else:
@@ -266,4 +268,25 @@ class TestDatabaseCleaner(unittest.TestCase):
             self.assertEqual((database, {3}), calls[0].args)
             self.assertEqual((database, {5}), calls[1].args)
 
-            # TODO: test: multiple policies
+    def test_twoPolicies_deleteMeasurements_oneSensor(self):
+        mockedCrud = Mock()
+
+        with patch.dict('sys.modules', **{'logic.database.Crud': mockedCrud}):
+            mockedCrud.DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
+            mockedCrud.get_measurements_for_sensor.side_effect = self.get_measurements_mocked
+            mockedCrud.get_sensors.return_value = [Schemas.Sensor(id=1, name="myTempSensor",
+                                                                  type="temperature", device_id=1)]
+            mockedCrud.get_first_measurement_for_sensor.return_value = self.FIRST_MEASUREMENT
+
+            database = Mock()
+            from logic.database.DatabaseCleaner import DatabaseCleaner
+            from logic.database.DatabaseCleaner import RetentionPolicy
+
+            policy1 = RetentionPolicy(numberOfMeasurementsPerDay=4, ageInDays=1)
+            policy2 = RetentionPolicy(numberOfMeasurementsPerDay=2, ageInDays=1)
+            DatabaseCleaner([policy1, policy2]).clean(database, datetime(year=2021, month=8, day=19).date())
+
+            calls = mockedCrud.delete_multiple_measurements.call_args_list
+            self.assertEqual(2, len(calls))
+            self.assertEqual((database, {3}), calls[0].args)
+            self.assertEqual((database, {3, 4}), calls[1].args)
