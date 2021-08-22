@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List
+from typing import List, Set
 
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
@@ -168,7 +168,7 @@ def delete_measurement(db: Session, measurement: Schemas.Measurement):
     db.commit()
 
 
-def delete_multiple_measurements(db: Session, measurementIds: List[int]):
+def delete_multiple_measurements(db: Session, measurementIds: Set[int]):
     db.query(Models.Measurement).filter(Models.Measurement.id.in_(measurementIds)).delete()
     db.commit()
 

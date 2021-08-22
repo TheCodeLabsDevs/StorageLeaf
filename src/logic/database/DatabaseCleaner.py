@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime, timedelta
-from typing import List, Optional
+from typing import List, Optional, Tuple, Set
 
 from sqlalchemy.orm import Session
 
@@ -12,66 +12,82 @@ LOGGER = logging.getLogger(Constants.APP_NAME)
 
 
 class DatabaseCleaner:
-    MIN_DATETIME = datetime(year=1970, month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+    MIN_DATE = datetime(year=1970, month=1, day=1).date()
 
     # TODO DEBUG:
-    # MIN_DATETIME = datetime.now() - timedelta(days=31)
+    # MIN_DATE = (datetime.now() - timedelta(days=31)).date()
 
     def __init__(self, retentionPolicies: List[RetentionPolicy]):
         self._policies = retentionPolicies
 
-    def clean(self, db: Session, currentDateTime: datetime):
+    def clean(self, db: Session, currentDate: datetime.date):
         LOGGER.info('Performing database cleanup...')
 
         for policy in self._policies:
             LOGGER.debug(f'Enforcing retention policy: {policy}')
 
-            policyStart = currentDateTime - timedelta(days=policy.ageInDays)
+            policyStart = currentDate - timedelta(days=policy.ageInDays)
+            processedDate = policyStart
+            while processedDate > self.MIN_DATE:
+                LOGGER.debug(f'Cleaning {processedDate.strftime("%Y-%m-%d")}...')
+                measurementIds, idsToDelete = DatabaseCleaner._categorize_measurements_for_day(db, date=processedDate,
+                                                                                               policy=policy)
 
-            affectedMeasurements = Crud.get_measurements(db=db,
-                                                         startDateTime=self.MIN_DATETIME.strftime(Crud.DATE_FORMAT),
-                                                         endDateTime=policyStart.strftime(Crud.DATE_FORMAT))
-            LOGGER.debug(f'Found {len(affectedMeasurements)} measurements older than {policyStart}')
-            if not affectedMeasurements:
-                continue
+                processedDate = processedDate - timedelta(days=1)
 
-            affectedMeasurements.reverse()
+                if not idsToDelete:
+                    continue
 
-            self.__delete_old_measurements(affectedMeasurements, db, policy)
+                LOGGER.debug(f'Scheduled {len(idsToDelete)} measurements for deletion (keeping: {len(measurementIds)}, '
+                             f'max allowed: {policy.numberOfMeasurementsPerDay})')
+
+                Crud.delete_multiple_measurements(db, idsToDelete)
 
         LOGGER.info('Database cleanup done')
 
         # TODO: force backup?
 
     @staticmethod
-    def _get_measurements_by_day(db: Session, date: datetime.date) -> List[Schemas.Measurement]:
-        startTime = datetime(year=date.year, month=date.month, day=date.day, hour=0, minute=0, second=0, microsecond=0)
-        endTime = datetime(year=date.year, month=date.month, day=date.day, hour=23, minute=59, second=59, microsecond=0)
+    def _categorize_measurements_for_day(db: Session, date: datetime.date,
+                                         policy: RetentionPolicy) -> Tuple[List[int], Set[int]]:
+        points = policy.determine_measurement_points(date)
 
-        return Crud.get_measurements(db=db,
-                                     startDateTime=startTime.strftime(Crud.DATE_FORMAT),
-                                     endDateTime=endTime.strftime(Crud.DATE_FORMAT))
+        measurementIdsToKeep = []
+        allMeasurementIds = set()
+        for index, point in enumerate(points):
+            previousItem = DatabaseCleaner.__get_previous_item(index, point, points)
+            nextItem = DatabaseCleaner.__get_next_item(index, point, points)
 
-    def _get_closest_measurement_for_point(self, measurements: List[Schemas.Measurement],
-                                           point: datetime,
-                                           upperLimit: datetime,
-                                           lowerLimit: datetime) -> Optional[Schemas.Measurement]:
-        pass
+            possibleMeasurements = Crud.get_measurements(db, previousItem.strftime(Crud.DATE_FORMAT),
+                                                         nextItem.strftime(Crud.DATE_FORMAT))
+            allMeasurementIds.update([m.id for m in possibleMeasurements])
 
-    def __delete_old_measurements(self, affectedMeasurements, db, policy):
-        lastTimestamp = datetime.strptime(affectedMeasurements[0].timestamp, Crud.DATE_FORMAT)
-        nextAllowedTimestamp = lastTimestamp - timedelta(minutes=policy.resolutionInMinutes)
+            closestMeasurement = DatabaseCleaner._get_closest_measurement_for_point(possibleMeasurements, point)
+            if closestMeasurement is not None:
+                measurementIdsToKeep.append(closestMeasurement.id)
 
-        measurementsIdsToDelete = []
+        return measurementIdsToKeep, {m for m in allMeasurementIds if m not in measurementIdsToKeep}
 
-        for measurement in affectedMeasurements[1:]:
-            timestamp = datetime.strptime(measurement.timestamp, Crud.DATE_FORMAT)
-            if timestamp > nextAllowedTimestamp:
-                measurementsIdsToDelete.append(measurement.id)
-            else:
-                lastTimestamp = timestamp
-                nextAllowedTimestamp = lastTimestamp - timedelta(minutes=policy.resolutionInMinutes)
+    @staticmethod
+    def __get_previous_item(index: int, point: datetime, points: List[datetime]) -> datetime:
+        if index == 0:
+            previousItem = point
+        else:
+            previousItem = points[index - 1]
+        return previousItem
 
-        LOGGER.debug(
-            f'Scheduled {len(measurementsIdsToDelete)} measurements for deletion (keeping {len(affectedMeasurements) - len(measurementsIdsToDelete)})')
-        Crud.delete_multiple_measurements(db, measurementsIdsToDelete)
+    @staticmethod
+    def __get_next_item(index: int, point: datetime, points: List[datetime]) -> datetime:
+        if index == (len(points) - 1):
+            nextItem = datetime(year=point.year, month=point.month, day=point.day, hour=23, minute=59, second=59)
+        else:
+            nextItem = points[index + 1]
+        return nextItem
+
+    @staticmethod
+    def _get_closest_measurement_for_point(measurements: List[Schemas.Measurement],
+                                           point: datetime) -> Optional[Schemas.Measurement]:
+        if not measurements:
+            return None
+
+        return min(measurements, key=lambda m: abs(datetime.strptime(m.timestamp, Crud.DATE_FORMAT) - point))
