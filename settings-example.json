@@ -23,11 +23,11 @@
         },
         "retentionPolicies": [
             {
-                "resolutionInMinutes": 60,
+                "numberOfMeasurementsPerDay": 24,
                 "ageInDays": 30
             },
             {
-                "resolutionInMinutes": 3600,
+                "numberOfMeasurementsPerDay": 2,
                 "ageInDays": 60
             }
         ]
