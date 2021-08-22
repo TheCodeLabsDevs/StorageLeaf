@@ -1,20 +1,14 @@
 import logging
-from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import List
+from typing import List, Optional
 
 from sqlalchemy.orm import Session
 
 from logic import Constants
-from logic.database import Crud
+from logic.database import Crud, Schemas
+from logic.database.RetentionPolicy import RetentionPolicy
 
 LOGGER = logging.getLogger(Constants.APP_NAME)
-
-
-@dataclass
-class RetentionPolicy:
-    resolutionInMinutes: int
-    ageInDays: int
 
 
 class DatabaseCleaner:
@@ -49,6 +43,21 @@ class DatabaseCleaner:
 
         # TODO: force backup?
 
+    @staticmethod
+    def _get_measurements_by_day(db: Session, date: datetime.date) -> List[Schemas.Measurement]:
+        startTime = datetime(year=date.year, month=date.month, day=date.day, hour=0, minute=0, second=0, microsecond=0)
+        endTime = datetime(year=date.year, month=date.month, day=date.day, hour=23, minute=59, second=59, microsecond=0)
+
+        return Crud.get_measurements(db=db,
+                                     startDateTime=startTime.strftime(Crud.DATE_FORMAT),
+                                     endDateTime=endTime.strftime(Crud.DATE_FORMAT))
+
+    def _get_closest_measurement_for_point(self, measurements: List[Schemas.Measurement],
+                                           point: datetime,
+                                           upperLimit: datetime,
+                                           lowerLimit: datetime) -> Optional[Schemas.Measurement]:
+        pass
+
     def __delete_old_measurements(self, affectedMeasurements, db, policy):
         lastTimestamp = datetime.strptime(affectedMeasurements[0].timestamp, Crud.DATE_FORMAT)
         nextAllowedTimestamp = lastTimestamp - timedelta(minutes=policy.resolutionInMinutes)
@@ -63,5 +72,6 @@ class DatabaseCleaner:
                 lastTimestamp = timestamp
                 nextAllowedTimestamp = lastTimestamp - timedelta(minutes=policy.resolutionInMinutes)
 
-        LOGGER.debug(f'Scheduled {len(measurementsIdsToDelete)} measurements for deletion (keeping {len(affectedMeasurements) - len(measurementsIdsToDelete)})')
+        LOGGER.debug(
+            f'Scheduled {len(measurementsIdsToDelete)} measurements for deletion (keeping {len(affectedMeasurements) - len(measurementsIdsToDelete)})')
         Crud.delete_multiple_measurements(db, measurementsIdsToDelete)
