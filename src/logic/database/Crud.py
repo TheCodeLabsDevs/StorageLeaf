@@ -168,6 +168,11 @@ def delete_measurement(db: Session, measurement: Schemas.Measurement):
     db.commit()
 
 
+def delete_multiple_measurements(db: Session, measurementIds: List[int]):
+    db.query(Models.Measurement).filter(Models.Measurement.id.in_(measurementIds)).delete()
+    db.commit()
+
+
 def get_total_number_of_measurements(db: Session) -> List[int]:
     return db.query(Models.Measurement).count()
 

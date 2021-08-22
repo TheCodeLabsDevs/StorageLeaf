@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
@@ -37,7 +39,7 @@ async def databaseCleanup(db: Session = Depends(get_database)):
     for item in retentionPolicies:
         policies.append(RetentionPolicy(resolutionInMinutes=item['resolutionInMinutes'], ageInDays=item['ageInDays']))
 
-    DatabaseCleaner(policies).clean(db)
+    DatabaseCleaner(policies).clean(db, datetime.now())
 
     infoAfter = DatabaseInfoProvider.get_database_info(db)
 
