@@ -35,13 +35,15 @@ async def databaseInfo(db: Session = Depends(get_database)):
 async def databaseCleanup(db: Session = Depends(get_database)):
     infoBefore = DatabaseInfoProvider.get_database_info(db)
 
-    retentionPolicies = SETTINGS['database']['cleanup']['retentionPolicies']
+    cleanupSettings = SETTINGS['database']['cleanup']
+
+    retentionPolicies = cleanupSettings['retentionPolicies']
     policies = []
     for item in retentionPolicies:
         policies.append(RetentionPolicy(numberOfMeasurementsPerDay=item['numberOfMeasurementsPerDay'],
                                         ageInDays=item['ageInDays']))
 
-    DatabaseCleaner(policies).clean(db, datetime.now().date())
+    DatabaseCleaner(policies, cleanupSettings['forceBackupAfterCleanup']).clean(db, datetime.now().date())
 
     infoAfter = DatabaseInfoProvider.get_database_info(db)
 

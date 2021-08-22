@@ -14,6 +14,8 @@ LOGGER = logging.getLogger(Constants.APP_NAME)
 class DatabaseCleaner:
     MIN_DATE = datetime(year=1970, month=1, day=1).date()
 
+    DATE_FORMAT = "%Y-%m-%d"
+
     def __init__(self, retentionPolicies: List[RetentionPolicy], forceBackupAfterCleanup: bool):
         self._policies = retentionPolicies
         self._forceBackupAfterCleanup = forceBackupAfterCleanup
@@ -28,9 +30,10 @@ class DatabaseCleaner:
 
             allSensors = Crud.get_sensors(db, skip=0, limit=1000000)
             for sensor in allSensors:
-                LOGGER.debug(f'Cleaning measurements for sensor "{sensor.name}" '
-                             f'(id: {sensor.id}, device_id: {sensor.device_id})')
                 self._cleanup_measurements_for_sensor(sensor, db, policy, policyStart)
+
+        LOGGER.debug('Performing database vacuum...')
+        Crud.perform_vacuum(db)
 
         LOGGER.info('Database cleanup done')
 
@@ -45,10 +48,13 @@ class DatabaseCleaner:
             return
 
         minDate = datetime.strptime(firstMeasurement.timestamp, Crud.DATE_FORMAT).date()
+        LOGGER.debug(f'Cleaning measurements for sensor "{sensor.name}" '
+                     f'from now to {minDate.strftime(DatabaseCleaner.DATE_FORMAT)} '
+                     f'(id: {sensor.id}, device_id: {sensor.device_id})')
 
         processedDate = policyStart
         while processedDate > minDate:
-            LOGGER.debug(f'Cleaning {processedDate.strftime("%Y-%m-%d")}...')
+            LOGGER.debug(f'Cleaning {processedDate.strftime(DatabaseCleaner.DATE_FORMAT)}...')
             DatabaseCleaner._cleanup_measurements_for_day(db, processedDate, policy, sensor.id)
             processedDate = processedDate - timedelta(days=1)
 
