@@ -30,8 +30,14 @@ class DatabaseCleaner:
                 LOGGER.debug(f'Cleaning measurements for sensor "{sensor.name}" '
                              f'(id: {sensor.id}, device_id: {sensor.device_id})')
 
+                firstMeasurement = Crud.get_first_measurement_for_sensor(db=db, sensorId=sensor.id)
+                if firstMeasurement is None:
+                    continue
+
+                minDate = datetime.strptime(firstMeasurement.timestamp, Crud.DATE_FORMAT).date()
+
                 processedDate = policyStart
-                while processedDate > self.MIN_DATE:
+                while processedDate > minDate:
                     LOGGER.debug(f'Cleaning {processedDate.strftime("%Y-%m-%d")}...')
                     measurementIds, idsToDelete = DatabaseCleaner._categorize_measurements_for_day(db,
                                                                                                    date=processedDate,

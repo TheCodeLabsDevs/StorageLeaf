@@ -58,6 +58,10 @@ class TestRetentionPolicy(unittest.TestCase):
 
 
 class TestDatabaseCleaner(unittest.TestCase):
+    FIRST_MEASUREMENT = Schemas.Measurement(id=0, value=18, sensor_id=1,
+                                            timestamp=datetime(year=2021, month=8, day=1,
+                                                               hour=22, minute=45, second=0).strftime(DATE_FORMAT))
+
     MEASUREMENT1 = Schemas.Measurement(id=1, value=5, sensor_id=1,
                                        timestamp=datetime(year=2021, month=8, day=18,
                                                           hour=6, minute=55, second=0).strftime(DATE_FORMAT))
@@ -225,6 +229,7 @@ class TestDatabaseCleaner(unittest.TestCase):
             mockedCrud.get_measurements_for_sensor.side_effect = self.get_measurements_mocked
             mockedCrud.get_sensors.return_value = [Schemas.Sensor(id=1, name="myTempSensor",
                                                                   type="temperature", device_id=1)]
+            mockedCrud.get_first_measurement_for_sensor.return_value = self.FIRST_MEASUREMENT
 
             database = Mock()
             from logic.database.DatabaseCleaner import DatabaseCleaner
@@ -235,6 +240,9 @@ class TestDatabaseCleaner(unittest.TestCase):
 
             mockedCrud.delete_multiple_measurements.assert_called_once_with(database, {3})
 
+            calls = mockedCrud.get_measurements_for_sensor.call_args_list
+            self.assertNotIn((database, '2020-01-01 00:00:00', '2020-01-01 06:00:00', 1), [call.args for call in calls])
+
     def test_onePolicy_deleteMeasurements_twoSensors(self):
         mockedCrud = Mock()
         with patch.dict('sys.modules', **{'logic.database.Crud': mockedCrud}):
@@ -244,6 +252,7 @@ class TestDatabaseCleaner(unittest.TestCase):
                                                                   type="temperature", device_id=1),
                                                    Schemas.Sensor(id=2, name="myHumiditySensor",
                                                                   type="humidity", device_id=1)]
+            mockedCrud.get_first_measurement_for_sensor.return_value = self.FIRST_MEASUREMENT
 
             database = Mock()
             from logic.database.DatabaseCleaner import DatabaseCleaner
@@ -256,6 +265,5 @@ class TestDatabaseCleaner(unittest.TestCase):
             self.assertEqual(2, len(calls))
             self.assertEqual((database, {3}), calls[0].args)
             self.assertEqual((database, {5}), calls[1].args)
-
 
             # TODO: test: multiple policies
