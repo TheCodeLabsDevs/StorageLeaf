@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from Settings import VERSION, SETTINGS
-from logic.Dependencies import get_database
+from logic.Dependencies import get_database, check_api_key
 from logic.database import Schemas, DatabaseInfoProvider
 from logic.database.DatabaseCleaner import DatabaseCleaner, RetentionPolicy
 
@@ -30,16 +30,18 @@ async def databaseInfo(db: Session = Depends(get_database)):
 
 @router.get('/databaseCleanup',
             summary='Cleans up the database by enforcing the configured retention policies',
-            response_model=Schemas.DatabaseCleanupInfo)
+            response_model=Schemas.DatabaseCleanupInfo,
+            dependencies=[Depends(check_api_key)])
 async def databaseCleanup(db: Session = Depends(get_database)):
     infoBefore = DatabaseInfoProvider.get_database_info(db)
 
     retentionPolicies = SETTINGS['database']['retentionPolicies']
     policies = []
     for item in retentionPolicies:
-        policies.append(RetentionPolicy(resolutionInMinutes=item['resolutionInMinutes'], ageInDays=item['ageInDays']))
+        policies.append(RetentionPolicy(numberOfMeasurementsPerDay=item['numberOfMeasurementsPerDay'],
+                                        ageInDays=item['ageInDays']))
 
-    DatabaseCleaner(policies).clean(db, datetime.now())
+    DatabaseCleaner(policies).clean(db, datetime.now().date())
 
     infoAfter = DatabaseInfoProvider.get_database_info(db)
 
