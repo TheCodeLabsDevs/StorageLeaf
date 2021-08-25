@@ -2,6 +2,7 @@ from datetime import datetime
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from starlette.background import BackgroundTasks
 
 from Settings import VERSION, SETTINGS
 from logic.Dependencies import get_database, check_api_key
@@ -28,10 +29,10 @@ async def databaseInfo(db: Session = Depends(get_database)):
     return DatabaseInfoProvider.get_database_info(db)
 
 
-@router.get('/databaseCleanup',
-            summary='Cleans up the database by enforcing the configured retention policies for each sensor',
-            response_model=Schemas.DatabaseCleanupInfo,
-            dependencies=[Depends(check_api_key)])
+@router.post('/databaseCleanup',
+             summary='Initiates a database cleanup by enforcing the configured retention policies for each sensor',
+             response_model=Schemas.Status,
+             dependencies=[Depends(check_api_key)])
 async def databaseCleanup(db: Session = Depends(get_database)):
     infoBefore = DatabaseInfoProvider.get_database_info(db)
 
@@ -51,5 +52,11 @@ async def databaseCleanup(db: Session = Depends(get_database)):
     sizeFreed = infoBefore.size_on_disk_in_mb - infoAfter.size_on_disk_in_mb
     infoDifference = Schemas.DatabaseInfo(number_of_measurements=deletedMeasurements, size_on_disk_in_mb=sizeFreed)
 
-    return Schemas.DatabaseCleanupInfo(before=infoBefore,  after=infoAfter,  difference=infoDifference)
+    return Schemas.DatabaseCleanupInfo(before=infoBefore, after=infoAfter, difference=infoDifference)
 
+
+@router.get('/databaseCleanup',
+            summary='Provides the status of the current database cleanup',
+            response_model=Schemas.DatabaseCleanupInfo)
+async def databaseCleanup():
+    return Schemas.DatabaseCleanupInfo(status=Schemas.DatabaseCleanupStatus.UNDEFINED)

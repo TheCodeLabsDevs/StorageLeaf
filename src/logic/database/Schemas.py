@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import List
 
 from pydantic import BaseModel, Field
@@ -38,10 +39,17 @@ class DatabaseInfo(BaseModel):
         }
 
 
+class DatabaseCleanupStatus(str, Enum):
+    UNDEFINED = 'UNDEFINED'
+    RUNNING = 'RUNNING'
+    FINISHED = 'FINISHED'
+
+
 class DatabaseCleanupInfo(BaseModel):
-    before: DatabaseInfo
-    after: DatabaseInfo
-    difference: DatabaseInfo
+    status: DatabaseCleanupStatus
+    before: DatabaseInfo = None
+    after: DatabaseInfo = None
+    difference: DatabaseInfo = None
 
 
 class MinMax(BaseModel):
