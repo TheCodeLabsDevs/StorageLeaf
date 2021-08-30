@@ -13,7 +13,7 @@ from logic import Constants
 from logic.DiscoveryService import DiscoveryService
 from logic.database import Models
 from logic.database.Database import engine
-from logic.routers import DeviceRouter, GeneralRouter
+from logic.routers import DeviceRouter, GeneralRouter, DatabaseRouter
 from logic.routers import SensorRouter, MeasurementRouter
 
 LOGGER = DefaultLogger().create_logger_if_not_exists(Constants.APP_NAME)
@@ -63,6 +63,7 @@ def overridden_redoc():
 
 
 app.include_router(GeneralRouter.router)
+app.include_router(DatabaseRouter.router)
 app.include_router(DeviceRouter.router)
 app.include_router(SensorRouter.router)
 app.include_router(MeasurementRouter.router)
