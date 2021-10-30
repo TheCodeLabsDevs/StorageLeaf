@@ -36,7 +36,7 @@ async def databaseCleanup(db: Session = Depends(get_database)):
 
 @router.get('/databaseCleanup',
             summary='Provides the status of the all scheduled database cleanup jobs',
-            response_model=Schemas.ScheduledJobs)
+            response_model=Schemas.ScheduledJobStatus)
 async def getStatus():
     from logic import JobScheduler
     return JobScheduler.SCHEDULER.get_scheduled_jobs()

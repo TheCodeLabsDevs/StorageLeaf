@@ -9,6 +9,7 @@ from apscheduler.triggers.cron import CronTrigger
 
 from logic import Constants
 from logic.database import Schemas
+from logic.database.Schemas import DatabaseCleanupInfo
 
 LOGGER = logging.getLogger(Constants.APP_NAME)
 TIMEZONE = pytz.timezone('Europe/Berlin')
@@ -31,6 +32,8 @@ class JobScheduler:
             self.ID_MANUAL: self.STATE_IDLE
         }
 
+        self._jobResults = []
+
         self._scheduler.start(paused=True)
 
         self._jobAutomatic.pause()
@@ -40,6 +43,9 @@ class JobScheduler:
 
     def job_event_listener(self, event: JobExecutionEvent):
         self._jobStatus[event.job_id] = self.STATE_IDLE
+
+        if isinstance(event.retval, DatabaseCleanupInfo):
+            self._jobResults.append(event.retval)
 
         if event.exception:
             LOGGER.error(f'Error executing job "{event.job_id}"')
@@ -60,7 +66,7 @@ class JobScheduler:
                                 id=self.ID_MANUAL, timezone=TIMEZONE)
         self._jobStatus[self.ID_MANUAL] = self.STATE_RUNNING
 
-    def get_scheduled_jobs(self) -> Schemas.ScheduledJobs:
+    def get_scheduled_jobs(self) -> Schemas.ScheduledJobStatus:
         jobs = []
         for job in self._scheduler.get_jobs():
             scheduledJob = Schemas.ScheduledJob(job_id=str(job.id),
@@ -68,7 +74,7 @@ class JobScheduler:
                                                 next_run=str(job.next_run_time))
             jobs.append(scheduledJob)
 
-        return Schemas.ScheduledJobs(jobs=jobs)
+        return Schemas.ScheduledJobStatus(jobs=jobs, job_results=self._jobResults)
 
 
 def dummyFunc():

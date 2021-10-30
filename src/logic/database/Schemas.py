@@ -1,3 +1,4 @@
+from datetime import datetime
 from enum import Enum
 from typing import List
 
@@ -50,6 +51,8 @@ class DatabaseCleanupInfo(BaseModel):
     before: DatabaseInfo = None
     after: DatabaseInfo = None
     difference: DatabaseInfo = None
+    startTime: datetime
+    endTime: datetime
 
 
 class MinMax(BaseModel):
@@ -152,5 +155,6 @@ class ScheduledJob(BaseModel):
         }
 
 
-class ScheduledJobs(BaseModel):
+class ScheduledJobStatus(BaseModel):
     jobs: List[ScheduledJob]
+    job_results: List[DatabaseCleanupInfo]

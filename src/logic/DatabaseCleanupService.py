@@ -13,7 +13,8 @@ class DatabaseCleanupService:
         self._cleanupSettings = cleanupSettings
 
     def cleanup(self, db: Session) -> Schemas.DatabaseCleanupInfo:
-        infoBefore = DatabaseInfoProvider.get_database_info(db)
+        infoBefore = DatabaseInfoProvider.get_database_info(db)#
+        startTime = datetime.now()
 
         retentionPolicies = self._cleanupSettings['retentionPolicies']
         policies = []
@@ -24,10 +25,12 @@ class DatabaseCleanupService:
         DatabaseCleaner(policies, self._cleanupSettings['forceBackupAfterCleanup']).clean(db, datetime.now().date())
 
         infoAfter = DatabaseInfoProvider.get_database_info(db)
+        endTime = datetime.now()
 
         deletedMeasurements = infoBefore.number_of_measurements - infoAfter.number_of_measurements
         sizeFreed = infoBefore.size_on_disk_in_mb - infoAfter.size_on_disk_in_mb
         infoDifference = Schemas.DatabaseInfo(number_of_measurements=deletedMeasurements, size_on_disk_in_mb=sizeFreed)
 
         return Schemas.DatabaseCleanupInfo(status=Schemas.DatabaseCleanupStatus.FINISHED, before=infoBefore,
-                                           after=infoAfter, difference=infoDifference)
+                                           after=infoAfter, difference=infoDifference,
+                                           startTime=startTime, endTime=endTime)
