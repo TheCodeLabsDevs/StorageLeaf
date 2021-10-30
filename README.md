@@ -7,6 +7,24 @@ An interactive OpenAPI Swagger documentation can be accessed by opening the serv
 - temperature
 - humidity
 
+
+## Automatic database backup
+The database can automatically be backed up to an owncloud instance. All backup settings can be found in the database section in `settings.json`.
+```json
+"backup":   {
+  "enable": true,
+  "maxModifications": 30,
+  "owncloudHost": "https://myowncloud.de",
+  "owncloudUser": "myUser",
+  "owncloudPassword": "",
+  "owncloudDestinationPath": "MyFolder"
+}
+```
+
+- `enable` - Enables the automatic backup.
+- `maxModifications` - A backup is run after this number of modifications are made to the database. As modification counts: creation, update or deletion of devices, sensors and measurements.
+- `owncloud...` - Owncloud specific settings 
+
 ## Automatic database cleanup
 Collecting data from many sensors in short time intervals will eventually lead to an increased database size.  
 The total number of measurements and the size on disk can be retrieved via the API: GET [http://localhost:10003/database/databaseInfo](http://localhost:10003/database/databaseInfo)
