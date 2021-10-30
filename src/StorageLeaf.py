@@ -1,8 +1,8 @@
-import json
 import os
 
 import uvicorn
 from TheCodeLabs_BaseUtils.DefaultLogger import DefaultLogger
+from apscheduler.triggers.cron import CronTrigger
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.docs import get_swagger_ui_html, get_redoc_html
@@ -10,6 +10,8 @@ from starlette.responses import RedirectResponse, FileResponse
 
 from Settings import SETTINGS, VERSION
 from logic import Constants
+from logic.DatabaseCleanupService import DatabaseCleanupService
+from logic.Dependencies import get_database
 from logic.DiscoveryService import DiscoveryService
 from logic.database import Models
 from logic.database.Database import engine
@@ -19,7 +21,6 @@ from logic.routers import SensorRouter, MeasurementRouter
 LOGGER = DefaultLogger().create_logger_if_not_exists(Constants.APP_NAME)
 
 DATABASE_SETTINGS = SETTINGS['database']
-
 
 # create database tables
 Models.Base.metadata.create_all(bind=engine)
@@ -60,6 +61,21 @@ def overridden_swagger():
 def overridden_redoc():
     return get_redoc_html(openapi_url='/openapi.json', title='The StorageLeaf API',
                           redoc_favicon_url=app.url_path_for('favicon'))
+
+
+@app.on_event("startup")
+async def startup_event():
+    cleanupSettings = SETTINGS['database']['cleanup']
+    if cleanupSettings['automatic']['enable']:
+        cleanupService = DatabaseCleanupService(cleanupSettings)
+
+        try:
+            cronTrigger = CronTrigger.from_crontab(cleanupSettings['automatic']['cronSchedule'])
+        except ValueError as e:
+            raise ValueError(f'Invalid syntax for settings option "cronSchedule": {str(e)}') from e
+
+        from logic import JobScheduler
+        JobScheduler.SCHEDULER.schedule_automatic_job(cleanupService.cleanup, [next(get_database())], cronTrigger)
 
 
 app.include_router(GeneralRouter.router)

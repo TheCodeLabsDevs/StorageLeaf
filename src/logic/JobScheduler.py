@@ -5,6 +5,7 @@ from typing import Callable, List
 import pytz
 from apscheduler.events import EVENT_JOB_EXECUTED, EVENT_JOB_ERROR, JobExecutionEvent
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.cron import CronTrigger
 
 from logic import Constants
 from logic.database import Schemas
@@ -45,10 +46,9 @@ class JobScheduler:
         else:
             LOGGER.debug(f'Successfully finished job "{event.job_id}" (retval: {event.retval})')
 
-    def schedule_automatic_job(self, func: Callable, args: List, interval_in_minutes: int):
+    def schedule_automatic_job(self, func: Callable, args: List, cronTrigger: CronTrigger):
         self._jobAutomatic = self._jobAutomatic.modify(func=func, args=args)
-        self._jobAutomatic = self._jobAutomatic.reschedule(trigger='interval', minutes=interval_in_minutes,
-                                                           timezone=TIMEZONE)
+        self._jobAutomatic = self._jobAutomatic.reschedule(trigger=cronTrigger, timezone=TIMEZONE)
         self._jobStatus[self.ID_AUTO] = self.STATE_RUNNING
 
     def run_manual_job(self, func: Callable, args: List):
@@ -79,4 +79,4 @@ class JobAlreadyRunningError(Exception):
     pass
 
 
-SCHEDULER = JobScheduler()
+SCHEDULER: JobScheduler = JobScheduler()
