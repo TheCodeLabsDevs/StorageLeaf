@@ -7,9 +7,21 @@ An interactive OpenAPI Swagger documentation can be accessed by opening the serv
 - temperature
 - humidity
 
+## First start
+- run `pipenv lock` and `pipenv install` to install all dependencies
+  - This project uses some personal libraries not available on the official pypi. The source code can be found here [https://thecodelabs.de/TheCodeLabs/PythonLibs](https://thecodelabs.de/TheCodeLabs/PythonLibs)
+- copy `settings-example.json` to `settings.json`
+- check the settings
+  - **Mandatory**: fill in your API password: `api` --> `key`
+  - **Optional**:
+    - change auto discover ports
+    - enable/disable automatic database update
+    - enable/disable automatic database cleanup
+- run `<path_to_python_in_virtualenv> StorageLeaf.py`
+
 
 ## Automatic database backup
-The database can automatically be backed up to an owncloud instance. All backup settings can be found in the database section in `settings.json`.
+The database can automatically be backed up to an owncloud instance. All backup settings can be found in the database section in `settings.json`:
 ```json
 "backup":   {
   "enable": true,
@@ -32,7 +44,7 @@ The total number of measurements and the size on disk can be retrieved via the A
 StorageLeaf provides an automatic cleanup procedure that deletes old measurements based on retention policies.``
 
 ### Settings
-All cleanup settings are specified in the database section in `settings.json`.
+All cleanup settings are specified in the database section in `settings.json`:
 ```json
 "cleanup": {
     "forceBackupAfterCleanup": false,
@@ -62,6 +74,28 @@ All cleanup settings are specified in the database section in `settings.json`.
 
 The cleanup can also be triggered manually via API: POST [http://localhost:10003/database/databaseCleanup](http://localhost:10003/database/databaseCleanup)  
 The status is available via GET [http://localhost:10003/database/databaseCleanup](http://localhost:10003/database/databaseCleanup)
+
+
+## Auto discovery
+To allow arbitrary devices to send measurements to a StorageLeaf instance normally the IP address of the StorageLeaf host must be well-known for those devices.  
+This can be quite uncomfortable in a local network without fixed IP addresses. Therefore, StorageLeaf provides an auto discover mechanism.  
+
+All auto discovery settings are specified in the discovery section in `settings.json`:
+
+```json
+"discovery": {
+  "discoveryPort": 9193,
+  "responsePort": 9194,
+  "requestMessage": "DISCOVER_STORAGELEAF_REQUEST",
+  "responseMessage": "DISCOVER_STORAGELEAF_RESPONSE"
+}
+```
+
+- `discoveryPort` - The StorageLeaf server listens to network broadcasts on this port. 
+- `requestMessage` - If this message is received via a network broadcast at `discoveryPort` port, the response is send.
+- `responsePort` - The response is send via this port.
+- `responseMessage` - This response message is send to the client who initiated the broadcast. The client can use this message to verify if a response originiates from the correct server. 
+
 
 ## Credits
 
