@@ -134,3 +134,23 @@ class SensorValue(BaseModel):
 class MultipleMeasurements(BaseModel):
     deviceName: str
     sensors: List[SensorValue]
+
+
+# ===== scheduled jobs =====
+class ScheduledJob(BaseModel):
+    job_id: str
+    run_frequency: str
+    next_run: str
+
+    class Config:
+        schema_extra = {
+            'example': {
+                'job_id': 'my job id',
+                'run_frequency': 'interval[0:05:00]',
+                'next_run': '2021-09-30 22:12:09.397935+2:00'
+            }
+        }
+
+
+class ScheduledJobs(BaseModel):
+    jobs: List[ScheduledJob]

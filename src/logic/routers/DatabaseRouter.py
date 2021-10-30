@@ -1,12 +1,10 @@
-from datetime import datetime
-
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from Settings import SETTINGS
+from logic.DatabaseCleanupService import DatabaseCleanupService
 from logic.Dependencies import get_database, check_api_key
 from logic.database import Schemas, DatabaseInfoProvider
-from logic.database.DatabaseCleaner import DatabaseCleaner, RetentionPolicy
 
 router = APIRouter(
     prefix='/database',
@@ -26,29 +24,19 @@ async def databaseInfo(db: Session = Depends(get_database)):
              response_model=Schemas.Status,
              dependencies=[Depends(check_api_key)])
 async def databaseCleanup(db: Session = Depends(get_database)):
-    infoBefore = DatabaseInfoProvider.get_database_info(db)
+    from logic import JobScheduler
+    cleanupService = DatabaseCleanupService(SETTINGS['database']['cleanup'])
+    try:
+        JobScheduler.SCHEDULER.run_manual_job(cleanupService.cleanup, args=[db])
+    except JobScheduler.JobAlreadyRunningError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
-    cleanupSettings = SETTINGS['database']['cleanup']
-
-    retentionPolicies = cleanupSettings['retentionPolicies']
-    policies = []
-    for item in retentionPolicies:
-        policies.append(RetentionPolicy(numberOfMeasurementsPerDay=item['numberOfMeasurementsPerDay'],
-                                        ageInDays=item['ageInDays']))
-
-    DatabaseCleaner(policies, cleanupSettings['forceBackupAfterCleanup']).clean(db, datetime.now().date())
-
-    infoAfter = DatabaseInfoProvider.get_database_info(db)
-
-    deletedMeasurements = infoBefore.number_of_measurements - infoAfter.number_of_measurements
-    sizeFreed = infoBefore.size_on_disk_in_mb - infoAfter.size_on_disk_in_mb
-    infoDifference = Schemas.DatabaseInfo(number_of_measurements=deletedMeasurements, size_on_disk_in_mb=sizeFreed)
-
-    return Schemas.DatabaseCleanupInfo(before=infoBefore, after=infoAfter, difference=infoDifference)
+    return Schemas.Status(message='Successfully triggered database cleanup')
 
 
 @router.get('/databaseCleanup',
-            summary='Provides the status of the current database cleanup',
-            response_model=Schemas.DatabaseCleanupInfo)
+            summary='Provides the status of the all scheduled database cleanup jobs',
+            response_model=Schemas.ScheduledJobs)
 async def databaseCleanup():
-    return Schemas.DatabaseCleanupInfo(status=Schemas.DatabaseCleanupStatus.UNDEFINED)
+    from logic import JobScheduler
+    return JobScheduler.SCHEDULER.get_scheduled_jobs()
