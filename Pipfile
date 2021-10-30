@@ -16,6 +16,6 @@ TheCodeLabs-BaseUtils = "*"
 fastapi = "==0.70.0"
 uvicorn = "==0.15.0"
 sqlalchemy = "==1.4.25"
-apscheduler = "==3.8.0"
+apscheduler = "==3.8.1"
 
 [dev-packages]
