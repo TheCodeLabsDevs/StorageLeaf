@@ -27,6 +27,8 @@ class JobScheduler:
         self._jobAutomatic = self._scheduler.add_job(func=dummyFunc, args=[], trigger='interval',
                                                      minutes=60, id=self.ID_AUTO, timezone=TIMEZONE)
 
+        self._jobManual = None
+
         self._jobStatus = {
             self.ID_AUTO: self.STATE_IDLE,
             self.ID_MANUAL: self.STATE_IDLE
@@ -61,9 +63,9 @@ class JobScheduler:
         if self._jobStatus[self.ID_MANUAL] == self.STATE_RUNNING:
             raise JobAlreadyRunningError(f'Job "{self.ID_MANUAL}" is already running!')
 
-        self._scheduler.add_job(func=func, args=args, trigger='date',
-                                run_date=datetime.now() + timedelta(seconds=5),
-                                id=self.ID_MANUAL, timezone=TIMEZONE)
+        self._jobManual = self._scheduler.add_job(func=func, args=args, trigger='date',
+                                                  run_date=datetime.now() + timedelta(seconds=5),
+                                                  id=self.ID_MANUAL, timezone=TIMEZONE)
         self._jobStatus[self.ID_MANUAL] = self.STATE_RUNNING
 
     def get_scheduled_jobs(self) -> Schemas.ScheduledJobStatus:
@@ -73,6 +75,14 @@ class JobScheduler:
                                                 run_frequency=str(job.trigger),
                                                 next_run=str(job.next_run_time))
             jobs.append(scheduledJob)
+
+        isManualJobInList = any(job for job in jobs if job.job_id == self.ID_MANUAL)
+        isManualJobRunning = self._jobStatus[self.ID_MANUAL] == self.STATE_RUNNING
+
+        if isManualJobRunning and not isManualJobInList:
+            jobs.append(Schemas.ScheduledJob(job_id=self.ID_MANUAL,
+                                             run_frequency=str(self._jobManual.trigger),
+                                             next_run=str(self._jobManual.next_run_time)))
 
         return Schemas.ScheduledJobStatus(jobs=jobs, job_results=self._jobResults)
 
