@@ -2,17 +2,17 @@ import logging
 from datetime import datetime, timedelta
 from typing import Callable, List
 
-import pytz
 from apscheduler.events import EVENT_JOB_EXECUTED, EVENT_JOB_ERROR, JobExecutionEvent
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
+from tzlocal import get_localzone
 
 from logic import Constants
 from logic.database import Schemas
 from logic.database.Schemas import DatabaseCleanupInfo
 
 LOGGER = logging.getLogger(Constants.APP_NAME)
-TIMEZONE = pytz.timezone('Europe/Berlin')
+TIMEZONE = get_localzone()
 
 
 class JobScheduler:
