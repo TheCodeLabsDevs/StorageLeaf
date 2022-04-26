@@ -15,7 +15,7 @@ class DiscoveryService:
         self._responseMessage = responseMessage
         self._apiPort = apiPort
 
-        self._shouldStop = False
+        self._stopEvent = threading.Event()
 
     def start(self):
         LOGGER.debug(f'Start discovery thread (listening on {self._discoveryPort}, responding on {self._responsePort})')
@@ -27,7 +27,7 @@ class DiscoveryService:
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
             sock.bind(('', self._discoveryPort))
 
-            while not self._shouldStop:
+            while not self._stopEvent.isSet():
                 try:
                     data, remoteIpAndPort = sock.recvfrom(1024)
                     data = data.strip()
@@ -42,5 +42,8 @@ class DiscoveryService:
                 except BaseException as e:
                     LOGGER.error(e)
 
+            LOGGER.debug(f'Stopped discovery thread')
+
     def stop(self):
-        self._shouldStop = True
+        LOGGER.debug(f'Discovery set to stop')
+        self._stopEvent.set()
