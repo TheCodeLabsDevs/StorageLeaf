@@ -21,6 +21,7 @@ class DiscoveryService:
         LOGGER.debug(f'Start discovery thread (listening on {self._discoveryPort}, responding on {self._responsePort})')
 
         x = threading.Thread(target=self.__loop)
+        x.daemon = True
         x.start()
 
     def __loop(self):
