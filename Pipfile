@@ -13,9 +13,9 @@ python_version = "3"
 
 [packages]
 TheCodeLabs-BaseUtils = "*"
-fastapi = "==0.70.0"
-uvicorn = "==0.15.0"
-sqlalchemy = "==1.4.25"
-apscheduler = "==3.8.1"
+fastapi = "==0.75.2"
+uvicorn = "==0.17.6"
+sqlalchemy = "==1.4.35"
+apscheduler = "==3.9.1"
 
 [dev-packages]
