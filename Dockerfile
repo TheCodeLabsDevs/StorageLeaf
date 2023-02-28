@@ -1,14 +1,18 @@
-FROM python:3.9-alpine
+FROM python:3.9-slim-bullseye
 
-RUN apk add --no-cache openssl-dev libffi-dev gcc musl-dev make
+RUN apt-get update && apt-get upgrade -y && \
+    apt-get install -y curl && \
+    rm -rf /var/lib/apt/lists/*
 
-RUN pip install pipenv
-COPY src /opt/StorageLeaf/src
-COPY Pipfile /opt/StorageLeaf
+RUN curl -sSL https://install.python-poetry.org | python -
+
+COPY . /opt/StorageLeaf
+RUN rm /opt/StorageLeaf/settings.json
 
 WORKDIR /opt/StorageLeaf
-RUN pipenv install
-RUN ln -s $(pipenv --venv) /opt/StorageLeaf/mypipenv
+RUN /root/.local/bin/poetry install --no-root && \
+    /root/.local/bin/poetry cache clear --all .
+RUN ln -s $($HOME/.local/share/pypoetry/venv/bin/poetry env info -p) /opt/StorageLeaf/myvenv
 
 WORKDIR /opt/StorageLeaf/src
-CMD [ "/opt/StorageLeaf/mypipenv/bin/python", "/opt/StorageLeaf/src/StorageLeaf.py" ]
+CMD [ "/opt/StorageLeaf/myvenv/bin/python", "/opt/StorageLeaf/src/StorageLeaf.py"]
