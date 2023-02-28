@@ -7,7 +7,7 @@ RUN apt-get update && apt-get upgrade -y && \
 RUN curl -sSL https://install.python-poetry.org | python -
 
 COPY . /opt/StorageLeaf
-RUN rm /opt/StorageLeaf/settings.json
+RUN rm -f /opt/StorageLeaf/settings.json
 
 WORKDIR /opt/StorageLeaf
 RUN /root/.local/bin/poetry install --no-root && \
