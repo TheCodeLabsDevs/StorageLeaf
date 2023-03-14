@@ -8,7 +8,7 @@ An interactive OpenAPI Swagger documentation can be accessed by opening the serv
 - humidity
 
 ## First start
-- run `pipenv lock` and `pipenv install` to install all dependencies
+- run `poetry install --no-root` to install all dependencies
   - This project uses some personal libraries not available on the official pypi. The source code can be found here [https://thecodelabs.de/TheCodeLabs/PythonLibs](https://thecodelabs.de/TheCodeLabs/PythonLibs)
 - copy `settings-example.json` to `settings.json`
 - check the settings
