@@ -15,7 +15,7 @@ thecodelabs-baseutils = "*"
 fastapi = "0.95.1"
 uvicorn = "0.22.0"
 sqlalchemy = "2.0.4"
-apscheduler = "3.10.0"
+apscheduler = "3.10.1"
 
 [tool.poetry.dev-dependencies]
 
