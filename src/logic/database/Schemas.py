@@ -18,7 +18,7 @@ class Version(BaseModel):
     date: str
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             'example': {
                 'name': 'v1.0.0',
                 'code': 1,
@@ -32,7 +32,7 @@ class DatabaseInfo(BaseModel):
     size_on_disk_in_mb: int
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             'example': {
                 'number_of_measurements': 1000,
                 'size_on_disk_in_mb': 14
@@ -68,7 +68,7 @@ class Measurement(BaseModel):
     sensor_id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class MeasurementCreate(BaseModel):
@@ -88,7 +88,7 @@ class SensorBase(BaseModel):
     type: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class SensorCreate(BaseModel):
@@ -109,7 +109,7 @@ class Sensor(SensorBase):
     device_id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 # ===== device =====
@@ -119,7 +119,7 @@ class Device(BaseModel):
     sensors: List[SensorBase]
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class DeviceCreate(BaseModel):
@@ -146,7 +146,7 @@ class ScheduledJob(BaseModel):
     next_run: str
 
     class Config:
-        schema_extra = {
+        json_schema_extra = {
             'example': {
                 'job_id': 'my job id',
                 'run_frequency': 'interval[0:05:00]',
