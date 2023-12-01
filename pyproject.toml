@@ -12,9 +12,9 @@ priority = "explicit"
 [tool.poetry.dependencies]
 python = "^3.9"
 thecodelabs-baseutils = {version = "*", source = "TheCodeLabs" }
-fastapi = "0.103.0"
-uvicorn = "0.23.2"
-sqlalchemy = "2.0.20"
+fastapi = "0.104.1"
+uvicorn = "0.24.0.post1"
+sqlalchemy = "2.0.23"
 apscheduler = "3.10.4"
 
 [tool.poetry.dev-dependencies]
