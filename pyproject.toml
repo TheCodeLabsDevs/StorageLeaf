@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "StorageLeaf"
-version = "2.14.0"
+version = "2.15.0"
 description = "Accepts sensor data and saves them into a database. The saved data can be accessed via api."
 authors = ["TheCodeLabsDevs"]
 
