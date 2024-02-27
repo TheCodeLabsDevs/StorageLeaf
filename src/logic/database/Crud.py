@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List, Set
 
-from sqlalchemy import and_
+from sqlalchemy import and_, text
 from sqlalchemy.orm import Session
 
 from Settings import SETTINGS
@@ -185,7 +185,7 @@ def get_total_number_of_measurements(db: Session) -> List[int]:
 
 
 def perform_vacuum(db: Session):
-    db.execute('VACUUM')
+    db.execute(text('VACUUM'))
 
 
 def __get_current_datetime():
