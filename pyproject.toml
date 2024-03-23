@@ -14,7 +14,7 @@ python = "^3.9"
 thecodelabs-baseutils = {version = "*", source = "TheCodeLabs" }
 fastapi = "0.110.0"
 uvicorn = "0.27.1"
-sqlalchemy = "2.0.27"
+sqlalchemy = "2.0.29"
 apscheduler = "3.10.4"
 
 [tool.poetry.dev-dependencies]
