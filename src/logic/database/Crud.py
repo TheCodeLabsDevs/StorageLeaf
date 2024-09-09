@@ -118,9 +118,9 @@ def get_measurements_for_sensor(db: Session, startDateTime: str,
                                 endDateTime: str, sensorId: int) -> List[Models.Measurement]:
     if startDateTime and endDateTime:
         return db.query(Models.Measurement) \
+            .filter(Models.Measurement.sensor_id == sensorId) \
             .filter(and_(startDateTime <= Models.Measurement.timestamp,
-                         endDateTime >= Models.Measurement.timestamp,
-                         Models.Measurement.sensor_id == sensorId)) \
+                         endDateTime >= Models.Measurement.timestamp)) \
             .order_by(Models.Measurement.timestamp.desc()) \
             .all()
 
