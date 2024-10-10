@@ -665,17 +665,18 @@ full = ["httpx (>=0.22.0)", "itsdangerous", "jinja2", "python-multipart (>=0.0.7
 
 [[package]]
 name = "thecodelabs-baseutils"
-version = "1.7.0"
+version = "1.8.2"
 description = "Useful python classes"
 optional = false
 python-versions = "*"
 files = [
-    {file = "TheCodeLabs-BaseUtils-1.7.0.tar.gz", hash = "sha256:90773f79f1bd7d3d864167a76e9afa5e542a0d003cc4a17f7096990093d808b2"},
+    {file = "TheCodeLabs-BaseUtils-1.8.2.tar.gz", hash = "sha256:7c3cacb02dcd93409f436c3c19b68a52e897781861855c3d2b48556e17306562"},
 ]
 
 [package.dependencies]
 psutil = "*"
 pyocclient = "*"
+requests = "*"
 snakeviz = "*"
 
 [package.source]
