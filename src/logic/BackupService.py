@@ -39,7 +39,7 @@ class BackupService:
         try:
             LOGGER.info('Running backup...')
             uploader = OwncloudUploader(self._owncloudHost, self._owncloudUser, self._owncloudPassword)
-            uploader.upload(self._owncloudDestinationPath, self._fileToBackup)
+            uploader.upload(self._owncloudDestinationPath, self._fileToBackup, chunked=False)
             self.__reset()
         except Exception:
             LOGGER.exception('Error performing backup')
