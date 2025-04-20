@@ -10,8 +10,7 @@ COPY . /opt/StorageLeaf
 RUN rm -f /opt/StorageLeaf/settings.json
 
 WORKDIR /opt/StorageLeaf
-RUN /root/.local/bin/poetry install --no-root && \
-    /root/.local/bin/poetry cache clear --all .
+RUN /root/.local/bin/poetry install --without dev
 RUN ln -s $($HOME/.local/share/pypoetry/venv/bin/poetry env info -p) /opt/StorageLeaf/myvenv
 
 WORKDIR /opt/StorageLeaf/src
