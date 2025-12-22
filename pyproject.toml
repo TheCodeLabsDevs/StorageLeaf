@@ -15,7 +15,7 @@ thecodelabs-baseutils = {version = "*", source = "TheCodeLabs" }
 fastapi = "0.124.4"
 uvicorn = "0.38.0"
 sqlalchemy = "2.0.45"
-apscheduler = "3.11.1"
+apscheduler = "3.11.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
