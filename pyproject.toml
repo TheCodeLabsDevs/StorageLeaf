@@ -10,7 +10,7 @@ url = "https://pypi.thecodelabs.de"
 priority = "explicit"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.13"
 thecodelabs-baseutils = {version = "*", source = "TheCodeLabs" }
 fastapi = "0.124.4"
 uvicorn = "0.38.0"
