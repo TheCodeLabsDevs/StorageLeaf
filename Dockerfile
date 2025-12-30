@@ -24,6 +24,6 @@ COPY --from=poetry /opt/StorageLeaf/venv /opt/StorageLeaf/venv
 RUN adduser -D StorageLeaf && chown -R StorageLeaf:StorageLeaf /opt/StorageLeaf
 USER StorageLeaf
 
-WORKDIR /opt/StorageLeaf/scr
+WORKDIR /opt/StorageLeaf/src
 EXPOSE 10003
 CMD [ "/opt/StorageLeaf/venv/bin/python", "/opt/StorageLeaf/src/StorageLeaf.py"]
