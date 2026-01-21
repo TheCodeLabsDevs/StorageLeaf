@@ -14,7 +14,7 @@ python = "^3.13"
 thecodelabs-baseutils = {version = "*", source = "TheCodeLabs" }
 fastapi = "0.128.0"
 uvicorn = "0.40.0"
-sqlalchemy = "2.0.45"
+sqlalchemy = "2.0.46"
 apscheduler = "3.11.2"
 
 [build-system]
