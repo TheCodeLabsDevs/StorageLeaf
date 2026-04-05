@@ -8,7 +8,9 @@ databasePath = SETTINGS['database']['databasePath']
 databaseUrl = f'sqlite:///{databasePath}'
 
 engine = create_engine(
-    databaseUrl, connect_args={'check_same_thread': False}
+    databaseUrl, connect_args={'check_same_thread': False},
+    pool_size=10,
+    max_overflow=10,
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
