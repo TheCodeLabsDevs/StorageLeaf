@@ -1,7 +1,7 @@
 FROM python:3.14-slim AS poetry
 
 RUN apt-get update && apt-get install -y \
-    curl gcc python3-dev libc-dev build-essential libpq-dev \
+    curl gcc python3-dev libc-dev build-essential \
     && rm -rf /var/lib/apt/lists/*
 
 RUN curl https://install.python-poetry.org | python -
