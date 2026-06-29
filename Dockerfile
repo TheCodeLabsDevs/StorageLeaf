@@ -1,8 +1,9 @@
-FROM python:3.14-alpine AS poetry
+FROM python:3.14-slim AS poetry
 
-RUN apk update && apk upgrade && \
-    apk add curl gcc python3-dev libc-dev build-base linux-headers && \
-    rm -rf /var/cache/apk
+RUN apt-get update && apt-get install -y \
+    curl gcc python3-dev libc-dev build-essential libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN curl https://install.python-poetry.org | python -
 
 COPY pyproject.toml /opt/StorageLeaf/pyproject.toml
@@ -13,15 +14,15 @@ WORKDIR /opt/StorageLeaf
 RUN /root/.local/bin/poetry install --no-root
 RUN ln -s $($HOME/.local/share/pypoetry/venv/bin/poetry env info -p) /opt/StorageLeaf/venv
 
-FROM python:3.14-alpine
+FROM python:3.14-slim
 
-RUN apk update && apk upgrade && \
-    rm -rf /var/cache/apk
+RUN apt-get update && apt-get upgrade -y && \
+    rm -rf /var/lib/apt/lists/*
 
 COPY src/ /opt/StorageLeaf/src
 COPY --from=poetry /opt/StorageLeaf/venv /opt/StorageLeaf/venv
 
-RUN adduser -D StorageLeaf && chown -R StorageLeaf:StorageLeaf /opt/StorageLeaf
+RUN adduser StorageLeaf && chown -R StorageLeaf:StorageLeaf /opt/StorageLeaf
 USER StorageLeaf
 
 WORKDIR /opt/StorageLeaf/src
