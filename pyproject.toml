@@ -14,7 +14,7 @@ python = "^3.14"
 thecodelabs-baseutils = {version = "*", source = "TheCodeLabs" }
 fastapi = "0.138.2"
 uvicorn = "0.49.0"
-sqlalchemy = "2.0.51"
+sqlalchemy = "2.0.52"
 apscheduler = "3.11.3"
 
 # explicitly pin versions of the following dependencies to ensure python 3.14 compatibility
