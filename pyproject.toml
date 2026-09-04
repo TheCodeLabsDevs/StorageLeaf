@@ -18,7 +18,7 @@ sqlalchemy = "2.0.51"
 apscheduler = "3.11.3"
 
 # explicitly pin versions of the following dependencies to ensure python 3.14 compatibility
-pydantic = "2.13.4"
+pydantic = "2.13.5"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
