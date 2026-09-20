@@ -1,4 +1,5 @@
 import os
+from contextlib import asynccontextmanager
 
 import uvicorn
 from TheCodeLabs_BaseUtils.DefaultLogger import DefaultLogger
@@ -25,11 +26,29 @@ DATABASE_SETTINGS = SETTINGS['database']
 # create database tables
 Models.Base.metadata.create_all(bind=engine)
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    cleanupSettings = SETTINGS['database']['cleanup']
+    if cleanupSettings['automatic']['enable']:
+        cleanupService = DatabaseCleanupService(cleanupSettings)
+
+        try:
+            cronTrigger = CronTrigger.from_crontab(cleanupSettings['automatic']['cronSchedule'])
+        except ValueError as e:
+            raise ValueError(f'Invalid syntax for settings option "cronSchedule": {str(e)}') from e
+
+        from logic import JobScheduler
+        JobScheduler.SCHEDULER.schedule_automatic_job(cleanupService.cleanup, [next(get_database())], cronTrigger)
+    yield
+
+
 app = FastAPI(title=Constants.APP_NAME,
               version=VERSION['name'],
               servers=[{'url': SETTINGS['api']['url'], 'description': f'{Constants.APP_NAME} API'}],
               docs_url=None,
-              redoc_url=None)
+              redoc_url=None,
+              lifespan=lifespan)
 
 if 'cors_origins' in SETTINGS['server']:
     app.add_middleware(
@@ -61,21 +80,6 @@ def overridden_swagger():
 def overridden_redoc():
     return get_redoc_html(openapi_url='/openapi.json', title='The StorageLeaf API',
                           redoc_favicon_url=app.url_path_for('favicon'))
-
-
-@app.on_event("startup")
-async def startup_event():
-    cleanupSettings = SETTINGS['database']['cleanup']
-    if cleanupSettings['automatic']['enable']:
-        cleanupService = DatabaseCleanupService(cleanupSettings)
-
-        try:
-            cronTrigger = CronTrigger.from_crontab(cleanupSettings['automatic']['cronSchedule'])
-        except ValueError as e:
-            raise ValueError(f'Invalid syntax for settings option "cronSchedule": {str(e)}') from e
-
-        from logic import JobScheduler
-        JobScheduler.SCHEDULER.schedule_automatic_job(cleanupService.cleanup, [next(get_database())], cronTrigger)
 
 
 app.include_router(GeneralRouter.router)
