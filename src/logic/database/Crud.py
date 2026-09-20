@@ -4,29 +4,11 @@ from typing import List, Set
 from sqlalchemy import and_, text
 from sqlalchemy.orm import Session
 
-from Settings import SETTINGS
-from logic.BackupService import BackupService
 from logic.database import Models, Schemas
 
 DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
 
-BACKUP_SERVICE = BackupService(SETTINGS['database']['databasePath'], **SETTINGS['database']['backup'])
-
-
-def notify_backup_service(backupService: BackupService):
-    def inner(func):
-        def wrapper(*args, **kwargs):
-            returnValue = func(*args, **kwargs)
-            backupService.perform_modification()
-            return returnValue
-
-        return wrapper
-
-    return inner
-
-
 # ===== devices =====
-
 
 def get_devices(db: Session, skip: int = 0, limit: int = 100) -> List[Models.Device]:
     return db.query(Models.Device).offset(skip).limit(limit).all()
@@ -40,7 +22,6 @@ def get_device_by_name(db: Session, name: str) -> Models.Device:
     return db.query(Models.Device).filter(Models.Device.name == name).first()
 
 
-@notify_backup_service(BACKUP_SERVICE)
 def create_device(db: Session, device: Schemas.DeviceCreate) -> Models.Device:
     dbDevice = Models.Device(name=device.name)
     db.add(dbDevice)
@@ -49,7 +30,6 @@ def create_device(db: Session, device: Schemas.DeviceCreate) -> Models.Device:
     return dbDevice
 
 
-@notify_backup_service(BACKUP_SERVICE)
 def update_device(db: Session, deviceId: int, device: Schemas.DeviceCreate) -> Models.Device:
     existingDevice = get_device(db, deviceId)
     existingDevice.name = device.name
@@ -58,7 +38,6 @@ def update_device(db: Session, deviceId: int, device: Schemas.DeviceCreate) -> M
     return existingDevice
 
 
-@notify_backup_service(BACKUP_SERVICE)
 def delete_device(db: Session, device: Schemas.Device):
     db.delete(device)
     db.commit()
@@ -79,7 +58,6 @@ def get_sensor_by_name_and_device_id(db: Session, sensorName: str, deviceId: int
                                                Models.Sensor.device_id == deviceId)).first()
 
 
-@notify_backup_service(BACKUP_SERVICE)
 def create_sensor(db: Session, sensor: Schemas.SensorCreate) -> Models.Sensor:
     dbSensor = Models.Sensor(**sensor.dict())
     db.add(dbSensor)
@@ -88,7 +66,6 @@ def create_sensor(db: Session, sensor: Schemas.SensorCreate) -> Models.Sensor:
     return dbSensor
 
 
-@notify_backup_service(BACKUP_SERVICE)
 def update_sensor(db: Session, sensorId: int, sensor: Schemas.SensorUpdate) -> Models.Sensor:
     existingSensor = get_sensor(db, sensorId)
     existingSensor.name = sensor.name
@@ -98,7 +75,6 @@ def update_sensor(db: Session, sensorId: int, sensor: Schemas.SensorUpdate) -> M
     return existingSensor
 
 
-@notify_backup_service(BACKUP_SERVICE)
 def delete_sensor(db: Session, sensor: Schemas.Sensor):
     db.delete(sensor)
     db.commit()
@@ -148,7 +124,6 @@ def get_measurement(db: Session, measurementId: int) -> Models.Measurement:
     return db.query(Models.Measurement).filter(Models.Measurement.id == measurementId).first()
 
 
-@notify_backup_service(BACKUP_SERVICE)
 def create_measurement(db: Session, measurement: Schemas.MeasurementCreate) -> Models.Measurement:
     if measurement.timestamp is None:
         measurement.timestamp = __get_current_datetime()
@@ -160,7 +135,6 @@ def create_measurement(db: Session, measurement: Schemas.MeasurementCreate) -> M
     return dbMeasurement
 
 
-@notify_backup_service(BACKUP_SERVICE)
 def update_measurement(db: Session, measurementId: int, measurement: Schemas.MeasurementUpdate) -> Models.Measurement:
     existingMeasurement = get_measurement(db, measurementId)
     existingMeasurement.value = measurement.value
@@ -169,7 +143,6 @@ def update_measurement(db: Session, measurementId: int, measurement: Schemas.Mea
     return existingMeasurement
 
 
-@notify_backup_service(BACKUP_SERVICE)
 def delete_measurement(db: Session, measurement: Schemas.Measurement):
     db.delete(measurement)
     db.commit()

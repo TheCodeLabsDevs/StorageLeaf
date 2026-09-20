@@ -22,7 +22,7 @@ class DatabaseCleanupService:
             policies.append(RetentionPolicy(numberOfMeasurementsPerDay=item['numberOfMeasurementsPerDay'],
                                             ageInDays=item['ageInDays']))
 
-        DatabaseCleaner(policies, self._cleanupSettings['forceBackupAfterCleanup']).clean(db, datetime.now().date())
+        DatabaseCleaner(policies).clean(db, datetime.now().date())
 
         infoAfter = DatabaseInfoProvider.get_database_info(db)
         endTime = datetime.now()

@@ -12,17 +12,7 @@
     },
     "database": {
         "databasePath": "storageLeaf.db",
-        "backup":
-        {
-            "enable": true,
-            "maxModifications": 30,
-            "owncloudHost": "https://myowncloud.de",
-            "owncloudUser": "myUser",
-            "owncloudPassword": "",
-            "owncloudDestinationPath": "MyFolder"
-        },
         "cleanup": {
-            "forceBackupAfterCleanup": true,
             "retentionPolicies": [
                 {
                     "numberOfMeasurementsPerDay": 24,

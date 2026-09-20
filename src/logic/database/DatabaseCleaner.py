@@ -16,9 +16,8 @@ class DatabaseCleaner:
 
     DATE_FORMAT = "%Y-%m-%d"
 
-    def __init__(self, retentionPolicies: List[RetentionPolicy], forceBackupAfterCleanup: bool):
+    def __init__(self, retentionPolicies: List[RetentionPolicy]):
         self._policies = retentionPolicies
-        self._forceBackupAfterCleanup = forceBackupAfterCleanup
 
     def clean(self, db: Session, currentDate: datetime.date):
         LOGGER.info('Performing database cleanup...')
@@ -36,9 +35,6 @@ class DatabaseCleaner:
         Crud.perform_vacuum(db)
 
         LOGGER.info('Database cleanup done')
-
-        if self._forceBackupAfterCleanup:
-            Crud.BACKUP_SERVICE.backup()
 
     @staticmethod
     def _cleanup_measurements_for_sensor(sensor: Schemas.Sensor, db: Session,
