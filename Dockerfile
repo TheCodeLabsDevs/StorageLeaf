@@ -1,4 +1,4 @@
-FROM python:3.14-slim AS poetry
+FROM python:3.15-slim AS poetry
 
 RUN apt-get update && apt-get install -y \
     curl gcc python3-dev libc-dev build-essential \
@@ -14,7 +14,7 @@ WORKDIR /opt/StorageLeaf
 RUN /root/.local/bin/poetry install --no-root
 RUN ln -s $($HOME/.local/share/pypoetry/venv/bin/poetry env info -p) /opt/StorageLeaf/venv
 
-FROM python:3.14-slim
+FROM python:3.15-slim
 
 RUN apt-get update && apt-get upgrade -y && \
     rm -rf /var/lib/apt/lists/*
